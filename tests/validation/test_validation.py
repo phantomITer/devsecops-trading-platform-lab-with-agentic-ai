@@ -5,6 +5,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import requests
+import time
 from tests.utils.base import check, save_history, print_summary
 
 BASE_URL = "http://127.0.0.1:8000"
@@ -19,7 +20,7 @@ def run_tests():
 
     # 선행: 계좌 생성
     r = requests.post(f"{BASE_URL}/api/accounts", json={
-        "name": "Validation Test Account",
+        "name": f"Validation-{int(time.time())}",
         "currency": "USD",
         "initial_balance": 10000
     })
@@ -38,7 +39,7 @@ def run_tests():
 
     # initial_balance 0 (경계값, 허용)
     r = requests.post(f"{BASE_URL}/api/accounts", json={
-        "name": "Zero Balance", "currency": "USD", "initial_balance": 0
+        "name": f"Zero-{int(time.time())}", "currency": "USD", "initial_balance": 0
     })
     check(results, "initial_balance=0 → 201 (허용)", r.status_code == 201)
 

@@ -8,12 +8,12 @@ from app.services import accounts_service
 router = APIRouter(prefix="/accounts", tags=["accounts"])
 
 
-@router.get("/", response_model=List[Account])
+# trailing slash 제거
+@router.get("", response_model=List[Account])   # "/" → ""
 def get_accounts():
     return accounts_service.list_accounts()
 
-
-@router.post("/", response_model=Account, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=Account, status_code=status.HTTP_201_CREATED)  # "/" → ""
 def create_account(payload: AccountCreate):
     return accounts_service.create_account(payload)
 

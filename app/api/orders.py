@@ -9,12 +9,12 @@ from app.services import orders_service
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 
-@router.get("/", response_model=List[Order])
+# app/api/orders.py 수정
+@router.get("", response_model=List[Order])          # "/" → ""
 def get_orders():
     return orders_service.list_orders()
 
-
-@router.post("/", response_model=Order, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=Order, status_code=status.HTTP_201_CREATED)  # "/" → ""
 def create_order(payload: OrderCreate):
     return orders_service.create_order(payload)
 

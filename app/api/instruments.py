@@ -23,7 +23,7 @@ def load_instruments():
 INSTRUMENTS_DATA = load_instruments()
 
 
-@router.get("/", response_model=List[InstrumentOut])
+@router.get("", response_model=List[InstrumentOut])
 def list_instruments(
     market: Optional[str] = Query(None, description="Market filter: KOSPI, KOSDAQ, US"),
     type: Optional[str] = Query(None, description="Type filter: STOCK, ETF"),
