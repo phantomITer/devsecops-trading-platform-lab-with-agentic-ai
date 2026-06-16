@@ -1,0 +1,13 @@
+# 전체 테스트 실행
+python -m pytest tests/
+
+# 유형별 실행
+python -m pytest tests/smoke/
+python -m pytest tests/validation/
+python -m pytest tests/security/
+
+# 특정 파일 실행
+python -m pytest tests/smoke/test_api_smoke.py
+
+# 현재처럼 직접 실행
+python tests/smoke/test_api_smoke.py

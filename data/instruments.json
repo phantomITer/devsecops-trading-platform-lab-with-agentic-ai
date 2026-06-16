@@ -1,0 +1,112 @@
+[
+  {
+    "symbol": "005930",
+    "name": "삼성전자",
+    "market": "KOSPI",
+    "type": "STOCK",
+    "sector": "반도체",
+    "currency": "KRW",
+    "current_price": 72000,
+    "change_percent": 1.2,
+    "volume": 1234567
+  },
+  {
+    "symbol": "000660",
+    "name": "SK하이닉스",
+    "market": "KOSPI",
+    "type": "STOCK",
+    "sector": "반도체",
+    "currency": "KRW",
+    "current_price": 185000,
+    "change_percent": -0.8,
+    "volume": 987654
+  },
+  {
+    "symbol": "035420",
+    "name": "NAVER",
+    "market": "KOSPI",
+    "type": "STOCK",
+    "sector": "IT서비스",
+    "currency": "KRW",
+    "current_price": 195000,
+    "change_percent": 0.5,
+    "volume": 345678
+  },
+  {
+    "symbol": "051910",
+    "name": "LG화학",
+    "market": "KOSPI",
+    "type": "STOCK",
+    "sector": "화학",
+    "currency": "KRW",
+    "current_price": 320000,
+    "change_percent": -1.2,
+    "volume": 234567
+  },
+  {
+    "symbol": "086520",
+    "name": "에코프로",
+    "market": "KOSDAQ",
+    "type": "STOCK",
+    "sector": "2차전지",
+    "currency": "KRW",
+    "current_price": 85000,
+    "change_percent": 3.5,
+    "volume": 1123456
+  },
+  {
+    "symbol": "AAPL",
+    "name": "Apple Inc.",
+    "market": "US",
+    "type": "STOCK",
+    "sector": "Technology",
+    "currency": "USD",
+    "current_price": 190.5,
+    "change_percent": -0.5,
+    "volume": 1000000
+  },
+  {
+    "symbol": "TSLA",
+    "name": "Tesla Inc.",
+    "market": "US",
+    "type": "STOCK",
+    "sector": "Automotive",
+    "currency": "USD",
+    "current_price": 250.0,
+    "change_percent": 2.3,
+    "volume": 2000000
+  },
+  {
+    "symbol": "NVDA",
+    "name": "NVIDIA Corporation",
+    "market": "US",
+    "type": "STOCK",
+    "sector": "Technology",
+    "currency": "USD",
+    "current_price": 875.0,
+    "change_percent": 1.8,
+    "volume": 1500000
+  },
+  {
+    "symbol": "QQQ",
+    "name": "Invesco QQQ Trust",
+    "market": "US",
+    "type": "ETF",
+    "sector": "Technology",
+    "currency": "USD",
+    "current_price": 380.0,
+    "change_percent": 0.8,
+    "volume": 500000
+  },
+  {
+    "symbol": "SPY",
+    "name": "SPDR S&P 500 ETF Trust",
+    "market": "US",
+    "type": "ETF",
+    "sector": "Broad Market",
+    "currency": "USD",
+    "current_price": 450.0,
+    "change_percent": 0.3,
+    "volume": 3000000
+  }
+]

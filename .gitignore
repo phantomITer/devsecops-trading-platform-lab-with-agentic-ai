@@ -1,0 +1,27 @@
+# 가상환경
+.venv/
+
+# Python 캐시
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# DB 파일
+*.db
+*.sqlite3
+
+# 환경변수
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# 테스트 이력 (선택: 올리고 싶으면 제거)
+tests/**/TEST_HISTORY_*.md
+
+# OS
+.DS_Store
+Thumbs.db
