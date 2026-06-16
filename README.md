@@ -1,6 +1,7 @@
 # DevSecOps Trading Platform Lab with Agentic AI
 
 안전하고 신뢰성있는 "모의 트레이딩(증권 시스템) 서비스"를 구현하기 위하여 하이브리드 인프라, DevSecOps for Agentic AI(RedAgent vs BlueAgent)을 수행하는 개인 프로젝트입니다.
+※ 본 프로젝트는 교육용 및 역량강화 목적입니다. 프로젝트 성공/실패 여하와 관계없이 결과물 구현에 노력하겠습니다.
 
 ---
 
