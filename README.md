@@ -1,6 +1,6 @@
 # DevSecOps Trading Platform Lab with Agentic AI
 
-본 프로젝트는 진보하는 AI기반 사이버공격에 따라 안전하고 신뢰성있는 "모의 트레이딩(증권 시스템) 플랫폼"를 구현해보면서  DevSecOps with Agentic AI 거버넌스를 조성하기 위한 경험을 수행해보고자 추진하는 개인 프로젝트입니다.
+본 프로젝트는 진보하는 AI기반 사이버공격에 따라 경각심을 가지며 안전하고 신뢰성있는 "모의 트레이딩(증권거래 시스템) 플랫폼"를 구현해보면서 DevSecOps with Agentic AI 거버넌스를 조성하기 위한 경험을 수행해보고자 추진하는 개인 프로젝트입니다.
 
 > ※ 본 프로젝트는 교육 및 역량강화 목적입니다. 따라서 본 프로젝트을 통하여 범죄 영감 획득, 악성 행위 활용 등의 경우에는 국내외 법에 따른 저촉을 받을 수 있으며, 본인에게는 책임이 없음을 명시합니다. 프로젝트 성공/실패 여하와 관계없이 결과물 구현에 노력하겠습니다.
 > 
@@ -51,7 +51,7 @@
 ### 2. 저장소 클론
 
 ```bash
-git clone https://github.com/USERNAME/devsecops-trading-platform-lab-with-agentic-ai.git
+git clone https://github.com/phantomITer/devsecops-trading-platform-lab-with-agentic-ai.git
 cd devsecops-trading-platform-lab-with-agentic-ai
 ```
 
