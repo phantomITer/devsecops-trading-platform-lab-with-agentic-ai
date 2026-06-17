@@ -223,7 +223,7 @@ pytest tests/ -v
 - 7개 ORM 모델: User, Account, Order, Position, MarketData, AgentLog, SecurityEvent
 - 도메인 검증 규칙: 수량/가격/계좌 존재 여부 등
 
-#### 🧪 테스트 체계 (79/79 통과)
+#### 🧪 테스트 체계 (71/71 통과)
 - **Smoke**: 전체 API 기본 동작 확인
 - **Validation**: 데이터 유효성 검사
 - **Integration**: 계좌→주문 연동 흐름
@@ -309,7 +309,7 @@ python  tests/e2e/test_e2e.py -v
 
 - FastAPI 백엔드 전체 구조 구축
 - SQLAlchemy ORM + SQLite DB 연동
-- 7개 도메인 모델 (User, Account, Order, Position, MarketData, AgentLog, SecurityEvent)
+- 8개 도메인 모델 (auth, users, accounts, orders, positions, market-data, agent-logs, security-event)
 - JWT 인증/인가
 - pykrx KRX 시장 데이터 연동
 - 도메인 검증 규칙 전체 적용
