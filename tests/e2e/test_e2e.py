@@ -1,109 +1,171 @@
+import pytest
 
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import requests
-from tests.utils.base import check as _chk, save_history, print_summary
+class TestE2E:
+    """E2E Test - 전체 시스템 시나리오 End-to-End 테스트"""
 
-BASE_URL = "http://127.0.0.1:8000"
+    def test_full_user_trading_flow(self, client):
+        """회원가입 → 로그인 → 계좌 → 주문 전체 흐름"""
+        # 1. 회원가입
+        r = client.post("/api/v1/auth/register", json={
+            "username": "e2euser",
+            "email": "e2e@test.com",
+            "password": "e2e1234"
+        })
+        assert r.status_code == 201
 
-def run_tests():
-    results = []
+        # 2. 로그인
+        r = client.post("/api/v1/auth/login", json={
+            "username": "e2euser",
+            "password": "e2e1234"
+        })
+        assert r.status_code == 200
+        assert "access_token" in r.json()
+        token = r.json()["access_token"]
 
-    def check(name, condition, detail=""):
-        _chk(results, name, condition, detail)
+        # 3. 계좌 생성
+        r = client.post("/api/v1/accounts/", json={
+            "name": "E2E 모의계좌",
+            "currency": "KRW",
+            "initial_balance": 10000000
+        })
+        assert r.status_code == 201
+        account_id = r.json()["id"]
 
-    print("\n" + "=" * 60)
-    print("E2E Test 시작")
-    print("=" * 60)
+        # 4. 계좌 조회 + 잔고 확인
+        r = client.get(f"/api/v1/accounts/{account_id}")
+        assert r.status_code == 200
+        assert r.json()["current_balance"] == 10000000
 
-    print("\n[ 시나리오: 회원가입 → 로그인 → 계좌 → 주문 전체 흐름 ]")
+        # 5. 매수 주문
+        r = client.post("/api/v1/orders/", json={
+            "account_id": account_id,
+            "symbol": "005930",
+            "side": "BUY",
+            "order_type": "LIMIT",
+            "quantity": 10,
+            "price": 75000
+        })
+        assert r.status_code == 201
+        assert r.json()["status"] == "NEW"
 
-    # 1. 회원가입
-    r = requests.post(f"{BASE_URL}/api/v1/auth/register", json={
-        "username": "e2euser",
-        "email": "e2e@test.com",
-        "password": "e2e1234"
-    })
-    check("1. 회원가입 → 201", r.status_code == 201)
+        # 6. 매도 주문
+        r = client.post("/api/v1/orders/", json={
+            "account_id": account_id,
+            "symbol": "005930",
+            "side": "SELL",
+            "order_type": "MARKET",
+            "quantity": 5
+        })
+        assert r.status_code == 201
 
-    # 2. 로그인
-    r = requests.post(f"{BASE_URL}/api/v1/auth/login", json={
-        "username": "e2euser",
-        "password": "e2e1234"
-    })
-    check("2. 로그인 → 200 + token", r.status_code == 200 and "access_token" in r.json())
-    token = r.json().get("access_token") if r.status_code == 200 else None
+        # 7. 주문 목록 확인
+        r = client.get("/api/v1/orders/")
+        assert r.status_code == 200
+        assert len(r.json()) >= 2
 
-    # 3. 계좌 생성
-    r = requests.post(f"{BASE_URL}/api/v1/accounts/", json={
-        "name": "E2E 모의계좌",
-        "currency": "KRW",
-        "initial_balance": 10000000
-    })
-    check("3. 계좌 생성 → 201", r.status_code == 201)
-    account_id = r.json().get("id") if r.status_code == 201 else None
+    def test_red_blue_agent_scenario(self, client):
+        """Red Agent 공격 → Blue Agent 탐지 시나리오"""
+        # Red Agent 공격 로그
+        r = client.post("/api/v1/agent-logs/", json={
+            "agent_id": "red-e2e-001",
+            "agent_type": "red",
+            "action": "A03_SQL_INJECTION",
+            "result": "공격 시도"
+        })
+        assert r.status_code == 201
 
-    # 4. 계좌 조회
-    r = requests.get(f"{BASE_URL}/api/v1/accounts/{account_id}")
-    check("4. 계좌 조회 → 200", r.status_code == 200)
-    check("4. 잔고 확인", r.json().get("current_balance") == 10000000)
+        # Blue Agent 보안 이벤트 기록
+        r = client.post("/api/v1/security-events/", json={
+            "event_type": "ATTACK",
+            "severity": "HIGH",
+            "source": "red-e2e-001",
+            "description": "SQL Injection 탐지 및 차단"
+        })
+        assert r.status_code == 201
 
-    # 5. 매수 주문
-    r = requests.post(f"{BASE_URL}/api/v1/orders/", json={
-        "account_id": account_id,
-        "symbol": "005930",
-        "side": "BUY",
-        "order_type": "LIMIT",
-        "quantity": 10,
-        "price": 75000
-    })
-    check("5. 매수 주문 → 201", r.status_code == 201)
-    check("5. 주문 상태 NEW", r.json().get("status") == "NEW")
+        # 전체 보안이벤트 확인
+        r = client.get("/api/v1/security-events/")
+        assert r.status_code == 200
+        assert len(r.json()) >= 1
 
-    # 6. 매도 주문
-    r = requests.post(f"{BASE_URL}/api/v1/orders/", json={
-        "account_id": account_id,
-        "symbol": "005930",
-        "side": "SELL",
-        "order_type": "MARKET",
-        "quantity": 5
-    })
-    check("6. 매도 주문 → 201", r.status_code == 201)
+    def test_multi_symbol_order_flow(self, client, test_account):
+        """복수 종목 주문 흐름 E2E"""
+        symbols = ["005930", "035420", "000660"]
+        for symbol in symbols:
+            r = client.post("/api/v1/orders/", json={
+                "account_id": test_account["id"],
+                "symbol": symbol,
+                "side": "BUY",
+                "order_type": "LIMIT",
+                "quantity": 5,
+                "price": 50000
+            })
+            assert r.status_code == 201
 
-    # 7. 주문 목록 확인
-    r = requests.get(f"{BASE_URL}/api/v1/orders/")
-    check("7. 주문 목록 → 200", r.status_code == 200)
-    check("7. 주문 2건 이상", len(r.json()) >= 2)
+        # 주문 목록 조회
+        r = client.get("/api/v1/orders/")
+        assert r.status_code == 200
+        assert len(r.json()) >= 3
 
-    # 8. Red Agent 공격 시뮬레이션
-    print("\n[ 시나리오: Red Agent 공격 → Blue Agent 탐지 ]")
-    r = requests.post(f"{BASE_URL}/api/v1/agent-logs/", json={
-        "agent_id": "red-e2e-001",
-        "agent_type": "red",
-        "action": "A03_SQL_INJECTION",
-        "result": "공격 시도"
-    })
-    check("8. Red Agent 로그 → 201", r.status_code == 201)
+    def test_positions_after_orders(self, client, test_account):
+        """주문 후 포지션 조회"""
+        # 주문 생성
+        client.post("/api/v1/orders/", json={
+            "account_id": test_account["id"],
+            "symbol": "005930",
+            "side": "BUY",
+            "order_type": "LIMIT",
+            "quantity": 10,
+            "price": 75000
+        })
 
-    # 9. Blue Agent 보안 이벤트 기록
-    r = requests.post(f"{BASE_URL}/api/v1/security-events/", json={
-        "event_type": "ATTACK",
-        "severity": "HIGH",
-        "source": "red-e2e-001",
-        "description": "SQL Injection 탐지 및 차단"
-    })
-    check("9. Blue Agent 보안이벤트 → 201", r.status_code == 201)
+        # 포지션 목록 조회
+        r = client.get("/api/v1/positions/")
+        assert r.status_code == 200
+        assert isinstance(r.json(), list)
 
-    # 10. 전체 보안이벤트 확인
-    r = requests.get(f"{BASE_URL}/api/v1/security-events/")
-    check("10. 보안이벤트 목록 → 200", r.status_code == 200)
-    check("10. 보안이벤트 존재 확인", len(r.json()) >= 1)
+    def test_complete_devsecops_flow(self, client):
+        """DevSecOps 전체 파이프라인 E2E"""
+        # 개발: 계좌 생성
+        r = client.post("/api/v1/accounts/", json={
+            "name": "DevSecOps 테스트",
+            "currency": "KRW",
+            "initial_balance": 50000000
+        })
+        assert r.status_code == 201
+        account_id = r.json()["id"]
 
-    passed, failed = print_summary(results, "E2E")
-    save_history("e2e/test_e2e.py", results)
-    return passed, failed
+        # 보안: Red Agent 취약점 스캔
+        r = client.post("/api/v1/agent-logs/", json={
+            "agent_id": "red-devsecops-001",
+            "agent_type": "red",
+            "action": "A01_BROKEN_ACCESS",
+            "result": "취약점 탐색"
+        })
+        assert r.status_code == 201
 
-if __name__ == "__main__":
-    run_tests()
+        # 보안: Blue Agent 탐지
+        r = client.post("/api/v1/security-events/", json={
+            "event_type": "ANOMALY",
+            "severity": "CRITICAL",
+            "source": "red-devsecops-001",
+            "description": "Broken Access Control 시도 탐지"
+        })
+        assert r.status_code == 201
+
+        # 운영: 주문 실행
+        r = client.post("/api/v1/orders/", json={
+            "account_id": account_id,
+            "symbol": "005930",
+            "side": "BUY",
+            "order_type": "MARKET",
+            "quantity": 100
+        })
+        assert r.status_code == 201
+
+        # 전체 상태 확인
+        assert client.get("/api/v1/accounts/").status_code == 200
+        assert client.get("/api/v1/orders/").status_code == 200
+        assert client.get("/api/v1/security-events/").status_code == 200
+        assert client.get("/api/v1/agent-logs/").status_code == 200
