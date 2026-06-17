@@ -1,139 +1,224 @@
+import pytest
 
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import requests
-from tests.utils.base import check as _chk, save_history, print_summary
+class TestValidation:
+    """Validation Test - 입력값 검증 및 에러 처리"""
 
-BASE_URL = "http://127.0.0.1:8000"
+    # ===== Account 검증 =====
 
-def run_tests():
-    results = []
+    def test_account_empty_name(self, client):
+        """Account name 빈 문자열 422"""
+        r = client.post("/api/v1/accounts/", json={
+            "name": "",
+            "currency": "KRW",
+            "initial_balance": 1000
+        })
+        assert r.status_code == 422
 
-    def check(name, condition, detail=""):
-        _chk(results, name, condition, detail)
+    def test_account_negative_balance(self, client):
+        """Account 음수 잔고 422"""
+        r = client.post("/api/v1/accounts/", json={
+            "name": "계좌",
+            "currency": "KRW",
+            "initial_balance": -1
+        })
+        assert r.status_code == 422
 
-    print("\n" + "=" * 60)
-    print("Validation Test 시작")
-    print("=" * 60)
+    def test_account_missing_currency(self, client):
+        """Account currency 누락 422"""
+        r = client.post("/api/v1/accounts/", json={
+            "name": "계좌",
+            "initial_balance": 1000
+        })
+        assert r.status_code == 422
 
-    # 계좌 생성용
-    r = requests.post(f"{BASE_URL}/api/v1/accounts/", json={
-        "name": "Validation 계좌",
-        "currency": "KRW",
-        "initial_balance": 1000000
-    })
-    account_id = r.json().get("id") if r.status_code == 201 else 1
+    def test_account_valid_creation(self, client):
+        """Account 정상 생성 201"""
+        r = client.post("/api/v1/accounts/", json={
+            "name": "Valid Account",
+            "currency": "KRW",
+            "initial_balance": 1000000
+        })
+        assert r.status_code == 201
+        assert r.json()["name"] == "Valid Account"
+        assert r.json()["current_balance"] == 1000000
 
-    print("\n[ Account 검증 ]")
-    r = requests.post(f"{BASE_URL}/api/v1/accounts/", json={
-        "name": "",
-        "currency": "KRW",
-        "initial_balance": 1000
-    })
-    check("빈 name → 422", r.status_code == 422)
+    # ===== Order 검증 =====
 
-    r = requests.post(f"{BASE_URL}/api/v1/accounts/", json={
-        "name": "계좌",
-        "currency": "KRW",
-        "initial_balance": -1
-    })
-    check("음수 initial_balance → 422", r.status_code == 422)
+    def test_order_zero_quantity(self, client, test_account):
+        """Order quantity=0 422"""
+        r = client.post("/api/v1/orders/", json={
+            "account_id": test_account["id"],
+            "symbol": "005930",
+            "side": "BUY",
+            "order_type": "LIMIT",
+            "quantity": 0,
+            "price": 75000
+        })
+        assert r.status_code == 422
 
-    r = requests.post(f"{BASE_URL}/api/v1/accounts/", json={
-        "name": "계좌",
-        "currency": "KRW",
-        "initial_balance": 0
-    })
-    check("initial_balance=0 → 201 (허용)", r.status_code == 201)
+    def test_order_negative_quantity(self, client, test_account):
+        """Order 음수 quantity 422"""
+        r = client.post("/api/v1/orders/", json={
+            "account_id": test_account["id"],
+            "symbol": "005930",
+            "side": "BUY",
+            "order_type": "LIMIT",
+            "quantity": -1,
+            "price": 75000
+        })
+        assert r.status_code == 422
 
-    print("\n[ Order 검증 ]")
-    r = requests.post(f"{BASE_URL}/api/v1/orders/", json={
-        "account_id": account_id,
-        "symbol": "005930",
-        "side": "HOLD",
-        "order_type": "LIMIT",
-        "quantity": 10,
-        "price": 75000
-    })
-    check("잘못된 side(HOLD) → 422", r.status_code == 422)
+    def test_order_limit_no_price(self, client, test_account):
+        """LIMIT 주문에 price 누락 시 400"""
+        r = client.post("/api/v1/orders/", json={
+            "account_id": test_account["id"],
+            "symbol": "005930",
+            "side": "BUY",
+            "order_type": "LIMIT",
+            "quantity": 10
+        })
+        assert r.status_code == 400
 
-    r = requests.post(f"{BASE_URL}/api/v1/orders/", json={
-        "account_id": account_id,
-        "symbol": "005930",
-        "side": "BUY",
-        "order_type": "WRONG",
-        "quantity": 10,
-        "price": 75000
-    })
-    check("잘못된 order_type → 422", r.status_code == 422)
+    def test_order_invalid_side(self, client, test_account):
+        """Order side 잘못된 값 422"""
+        r = client.post("/api/v1/orders/", json={
+            "account_id": test_account["id"],
+            "symbol": "005930",
+            "side": "INVALID_SIDE",
+            "order_type": "LIMIT",
+            "quantity": 10,
+            "price": 75000
+        })
+        assert r.status_code == 422
 
-    r = requests.post(f"{BASE_URL}/api/v1/orders/", json={
-        "account_id": account_id,
-        "symbol": "005930",
-        "side": "BUY",
-        "order_type": "LIMIT",
-        "quantity": 0,
-        "price": 75000
-    })
-    check("quantity=0 → 422", r.status_code == 422)
+    def test_order_invalid_type(self, client, test_account):
+        """Order type 잘못된 값 422"""
+        r = client.post("/api/v1/orders/", json={
+            "account_id": test_account["id"],
+            "symbol": "005930",
+            "side": "BUY",
+            "order_type": "INVALID_TYPE",
+            "quantity": 10,
+            "price": 75000
+        })
+        assert r.status_code == 422
 
-    r = requests.post(f"{BASE_URL}/api/v1/orders/", json={
-        "account_id": account_id,
-        "symbol": "005930",
-        "side": "BUY",
-        "order_type": "LIMIT",
-        "quantity": -5,
-        "price": 75000
-    })
-    check("quantity 음수 → 422", r.status_code == 422)
+    def test_order_missing_symbol(self, client, test_account):
+        """Order symbol 누락 422"""
+        r = client.post("/api/v1/orders/", json={
+            "account_id": test_account["id"],
+            "side": "BUY",
+            "order_type": "MARKET",
+            "quantity": 10
+        })
+        assert r.status_code == 422
 
-    r = requests.post(f"{BASE_URL}/api/v1/orders/", json={
-        "account_id": account_id,
-        "symbol": "005930",
-        "side": "BUY",
-        "order_type": "LIMIT",
-        "quantity": 10
-    })
-    check("LIMIT 주문 price 없음 → 400", r.status_code == 400)
+    def test_order_nonexistent_account(self, client):
+        """Order 존재하지 않는 account 400"""
+        r = client.post("/api/v1/orders/", json={
+            "account_id": 9999,
+            "symbol": "005930",
+            "side": "BUY",
+            "order_type": "MARKET",
+            "quantity": 10
+        })
+        assert r.status_code == 400
 
-    r = requests.post(f"{BASE_URL}/api/v1/orders/", json={
-        "account_id": 9999,
-        "symbol": "005930",
-        "side": "BUY",
-        "order_type": "MARKET",
-        "quantity": 10
-    })
-    check("없는 account_id → 400", r.status_code == 400)
+    def test_order_valid_limit(self, client, test_account):
+        """Order LIMIT 정상 생성 201"""
+        r = client.post("/api/v1/orders/", json={
+            "account_id": test_account["id"],
+            "symbol": "005930",
+            "side": "BUY",
+            "order_type": "LIMIT",
+            "quantity": 10,
+            "price": 75000
+        })
+        assert r.status_code == 201
+        assert r.json()["status"] == "NEW"
 
-    r = requests.post(f"{BASE_URL}/api/v1/orders/", json={
-        "account_id": account_id,
-        "symbol": "005930",
-        "side": "BUY",
-        "order_type": "MARKET",
-        "quantity": 10
-    })
-    check("MARKET 주문 price 없어도 → 201", r.status_code == 201)
+    def test_order_valid_market(self, client, test_account):
+        """Order MARKET 정상 생성 201"""
+        r = client.post("/api/v1/orders/", json={
+            "account_id": test_account["id"],
+            "symbol": "005930",
+            "side": "SELL",
+            "order_type": "MARKET",
+            "quantity": 5
+        })
+        assert r.status_code == 201
 
-    print("\n[ Auth 검증 ]")
-    r = requests.post(f"{BASE_URL}/api/v1/auth/register", json={
-        "username": "",
-        "email": "empty@test.com",
-        "password": "test1234"
-    })
-    check("빈 username → 422", r.status_code == 422)
+    # ===== Auth 검증 =====
 
-    r = requests.post(f"{BASE_URL}/api/v1/auth/register", json={
-        "username": "valuser",
-        "email": "notanemail",
-        "password": "test1234"
-    })
-    check("잘못된 email 형식 → 생성됨(422 아닐수있음)", r.status_code in (201, 422))
+    def test_register_missing_email(self, client):
+        """Register email 누락 422"""
+        r = client.post("/api/v1/auth/register", json={
+            "username": "user1",
+            "password": "pass1234"
+        })
+        assert r.status_code == 422
 
-    passed, failed = print_summary(results, "Validation")
-    save_history("validation/test_validation.py", results)
-    return passed, failed
+    def test_register_missing_password(self, client):
+        """Register password 누락 422"""
+        r = client.post("/api/v1/auth/register", json={
+            "username": "user1",
+            "email": "user1@test.com"
+        })
+        assert r.status_code == 422
 
-if __name__ == "__main__":
-    run_tests()
+    def test_register_duplicate_username(self, client):
+        """Register 중복 username 409"""
+        client.post("/api/v1/auth/register", json={
+            "username": "dupuser",
+            "email": "dup@test.com",
+            "password": "pass1234"
+        })
+        r = client.post("/api/v1/auth/register", json={
+            "username": "dupuser",
+            "email": "dup2@test.com",
+            "password": "pass1234"
+        })
+        assert r.status_code == 409
+
+    # ===== Agent Log 검증 =====
+
+    def test_agent_log_missing_agent_id(self, client):
+        """AgentLog agent_id 누락 422"""
+        r = client.post("/api/v1/agent-logs/", json={
+            "agent_type": "red",
+            "action": "TEST_ACTION",
+            "result": "ok"
+        })
+        assert r.status_code == 422
+
+    def test_agent_log_valid(self, client):
+        """AgentLog 정상 생성 201"""
+        r = client.post("/api/v1/agent-logs/", json={
+            "agent_id": "val-agent-001",
+            "agent_type": "blue",
+            "action": "DETECT",
+            "result": "blocked"
+        })
+        assert r.status_code == 201
+
+    # ===== Security Event 검증 =====
+
+    def test_security_event_missing_event_type(self, client):
+        """SecurityEvent event_type 누락 422"""
+        r = client.post("/api/v1/security-events/", json={
+            "severity": "HIGH",
+            "source": "red-agent",
+            "description": "test"
+        })
+        assert r.status_code == 422
+
+    def test_security_event_valid(self, client):
+        """SecurityEvent 정상 생성 201"""
+        r = client.post("/api/v1/security-events/", json={
+            "event_type": "ANOMALY",
+            "severity": "MEDIUM",
+            "source": "blue-agent",
+            "description": "Anomaly 탐지"
+        })
+        assert r.status_code == 201
