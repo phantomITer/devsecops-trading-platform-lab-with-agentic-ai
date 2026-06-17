@@ -3,7 +3,7 @@
 현재는 진보하는 AI기반 사이버공격에 대한 두려움과 경각심을 가지고 있습니다. 안전하고 신뢰성 있는 **"모의 증권거래 플랫폼"**을 구현하면서 DevSecOps with Agentic AI 거버넌스를 조성하고 Agentic AI의 행동 연구를 수행하고자 추진된 개인 프로젝트입니다.
 
 > ⚠️ **면책조항**
-> 본 프로젝트는 교육 및 역량강화 목적입니다. 범죄 영감 획득, 악성 행위 활용 등은 국내외 법에 따른 처벌 대상이며, 프로젝트 작성자는 책임을 지지 않습니다.
+> 본 프로젝트는 교육 및 역량강화 목적입니다. 사이버 범죄 영감 획득, 악성 행위 활용 등은 국내외 법에 따른 처벌 대상이며, 프로젝트 작성자는 책임을 지지 않습니다.
 
 ---
 
@@ -52,21 +52,24 @@ pip install -r requirements.txt
 echo "DB_TYPE=sqlite" > .env
 
 # 서버 실행
-python run.py
+uvicorn app.main:app --reload
+# uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 #### 옵션 B: MySQL (프로덕션, 선택)
 ```bash
 # Docker MySQL 시작
-docker-compose up -d
+docker-compose -f infra/docker-compose.yml up -d
 
 # .env 파일 생성
+cat > .env << EOF
 DB_TYPE=mysql
 DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=trading_platform
 DB_USER=trading_user
 DB_PASS=trading_pass
+EOF
 
 # 테이블 생성
 python -c "from app.database import init_db; init_db()"
@@ -74,7 +77,8 @@ python -c "from app.database import init_db; init_db()"
 
 ### 5. 서버 실행
 ```bash
-python run.py
+uvicorn app.main:app --reload
+# uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### 6. 동작 확인
