@@ -11,14 +11,13 @@
 
 | Phase | 핵심 목표 | 상태 | 완성 기준 |
 |-------|-----------|------|-----------|
-| **Phase 1** | Backend Development | ✅ **95%** | 인간이 API로 거래 가능 |
+| **Phase 1** | Backend Development | ✅ **100%** | 인간이 API로 거래 가능 |
 | **Phase 2** | Frontend Development | ⏳ 대기 | 인간이 UI로 거래 및 운영 가능 |
 | **Phase 3** | Platform Validation | ⏳ 대기 | 안정적 운영 확인 |
-| **Phase 4** | DevSecOps | ⏳ 대기 | 배포 준비 완료 |
+| **Phase 4** | DevSecOps | 🟡 **60%** | 배포 준비 완료 |
 | **Phase 5** | Agentic AI Ecosystem | 🟡 **20%** | AI 간 자율 상호작용 |
 
 ---
-
 
 ## ⚡ Quick Start
 
@@ -100,10 +99,11 @@ pytest tests/validation/ -v
 pytest tests/integration/ -v
 pytest tests/security/ -v
 pytest tests/e2e/ -v
+pytest tests/test_phase2_agents.py -v
+pytest tests/test_v1.py -v
 ```
 
 ---
-
 
 ## 🎯 프로젝트 아키텍처
 
@@ -131,7 +131,7 @@ graph TB
     subgraph P1["Phase 1: Backend Development ✅"]
         A1[1.1 FastAPI API] --> A2[1.2 비즈니스 로직]
         A1 --> A3[1.3 SQLite DB]
-        A2 --> A4[1.4 테스트 71개]
+        A2 --> A4[1.4 테스트 110개]
         A3 --> A4
         A4 --> A5[1.5 MySQL 전환 - 선택]
         A1 --> A6[1.6 Market Data]
@@ -154,11 +154,11 @@ graph TB
         C2 --> C3
     end
 
-    subgraph P4["Phase 4: DevSecOps ⏳"]
+    subgraph P4["Phase 4: DevSecOps 🟡"]
         D1[4.1 보안 점검]
-        D2[4.2 SAST/DAST]
+        D2[4.2 SAST/DAST ✅]
         D3[4.3 Docker]
-        D4[4.4 CI/CD]
+        D4[4.4 CI/CD ✅]
         D5[4.5 Cloud - 선택]
         D1 --> D2
         D2 --> D3
@@ -198,8 +198,8 @@ graph TB
     classDef partial fill:#7a3d00,stroke:#FFA500,stroke-width:2px,color:#ffffff
 
     class A1,A2,A3,A4,A6 completed
-    class A5 inProgress
-    class B1,B2,B3,B4,C1,C2,C3,D1,D2,D3,D4,D5,E4,E5,E6 waiting
+    class A5,D2,D4 inProgress
+    class B1,B2,B3,B4,C1,C2,C3,D1,D3,D5,E4,E5,E6 waiting
     class E1,E2,E3 partial
 ```
 
@@ -208,6 +208,7 @@ graph TB
 ## 🗺️ 상세 Roadmap
 
 ### 📊 예상 일정 요약
+
 ```mermaid
 gantt
     title Phase 개발 타임라인
@@ -219,34 +220,33 @@ gantt
     MySQL 전환             :active, p1-2, 2026-06-17, 2026-06-18
 
     section P2-Frontend
-    투자자 UI              :        p2-1, 2026-06-25, 21d
-    포트폴리오             :        p2-2, after p2-1, 14d
-    운영자 UI              :        p2-3, after p2-2, 14d
-    실시간 시세            :        p2-4, after p2-1, 14d
+    투자자 UI              : p2-1, 2026-06-25, 21d
+    포트폴리오             : p2-2, after p2-1, 14d
+    운영자 UI              : p2-3, after p2-2, 14d
+    실시간 시세            : p2-4, after p2-1, 14d
 
     section P3-Validation
-    E2E 테스트             :        p3-1, after p2-3, 10d
-    성능/부하              :        p3-2, after p3-1, 7d
-    UAT                    :        p3-3, after p3-2, 7d
+    E2E 테스트             : p3-1, after p2-3, 10d
+    성능/부하              : p3-2, after p3-1, 7d
+    UAT                    : p3-3, after p3-2, 7d
 
     section P4-DevSecOps
-    보안 점검              :        p4-1, after p3-3, 7d
-    SAST/DAST             :        p4-2, after p4-1, 7d
-    Docker                 :        p4-3, after p4-2, 7d
-    CI/CD                  :        p4-4, after p4-3, 7d
-    클라우드               :        p4-5, after p4-4, 14d
+    보안 점검              : p4-1, after p3-3, 7d
+    SAST/DAST (완료)       :done,   p4-2, 2026-06-17, 2026-06-18
+    Docker                 : p4-3, after p4-2, 7d
+    CI/CD (완료)           :done,   p4-4, 2026-06-17, 2026-06-18
+    클라우드               : p4-5, after p4-4, 14d
 
     section P5-AgenticAI
     AI 인프라 (완료)       :done,   p5-1, 2026-07-01, 2026-07-05
-    LLM 추상화             :        p5-2, after p4-4, 14d
-    거래 AI                :        p5-3, after p5-2, 21d
-    보안 AI                :        p5-4, after p5-2, 21d
-    Multi-Agent            :        p5-5, after p5-3, 14d
-    AI 행동 연구           :        p5-6, after p5-5, 30d
+    LLM 추상화             : p5-2, after p4-4, 14d
+    거래 AI                : p5-3, after p5-2, 21d
+    보안 AI                : p5-4, after p5-2, 21d
+    Multi-Agent            : p5-5, after p5-3, 14d
+    AI 행동 연구           : p5-6, after p5-5, 30d
 ```
 
-
-### ✅ Phase 1: Backend Development (95% 완료)
+### ✅ Phase 1: Backend Development (100% 완료)
 
 **목표**: 거래 플랫폼 서버 구축 — 인간이 API로 거래 가능
 
@@ -255,7 +255,7 @@ gantt
 | 1.1 FastAPI REST API | ✅ 완료 | 주문/계좌/포지션/시세 API |
 | 1.2 비즈니스 로직 | ✅ 완료 | 주문 체결, 잔고 검증 |
 | 1.3 Database (SQLite) | ✅ 완료 | 로컬 개발 환경 |
-| 1.4 Unit/Integration 테스트 | ✅ 완료 | 71개 테스트 통과 |
+| 1.4 Unit/Integration 테스트 | ✅ 완료 | 110개 테스트 통과 |
 | 1.5 Database (MySQL) *(선택)* | 🔄 진행 중 | 프로덕션 DB 준비 |
 | 1.6 Market Data 연동 | ✅ 완료 | pykrx 실시간 시세 |
 
@@ -286,16 +286,15 @@ gantt
 
 ---
 
-### ⏳ Phase 4: DevSecOps (대기)
-
+### 🟡 Phase 4: DevSecOps (60% 완료)
 **목표**: 안전한 운영 환경 — 배포 준비 완료
 
 | 항목 | 상태 | 설명 |
 |------|------|------|
 | 4.1 보안 점검 및 보완 | ⏳ 대기 | 취약점 스캔, 기존 보안 강화 검토 |
-| 4.2 보안 스캔 자동화 | ⏳ 대기 | SAST/DAST (Bandit, OWASP ZAP) |
+| 4.2 보안 스캔 자동화 | ✅ 완료 | SAST/DAST (Bandit, Dependency 취약점 스캔) |
 | 4.3 컨테이너화 | ⏳ 대기 | Docker + docker-compose |
-| 4.4 CI/CD 파이프라인 | ⏳ 대기 | GitHub Actions 자동화 |
+| 4.4 CI/CD 파이프라인 | ✅ 완료 | GitHub Actions 자동화 |
 | 4.5 클라우드 배포 *(선택)* | ⏳ 대기 | Azure/AWS 운영 환경 |
 
 ---
@@ -335,12 +334,6 @@ gantt
 | 연구 주제 | 분석 항목 |
 |-----------|-----------|
 | AI 거래 패턴 분석 | 수익률, 리스크 대비 수익, 거래 빈도, 보유 기간 |
-| AI 간 상호작용 | 경쟁
-#### 5.6 AI 행동 연구 주제
-
-| 연구 주제 | 분석 항목 |
-|-----------|-----------|
-| AI 거래 패턴 분석 | 수익률, 리스크 대비 수익, 거래 빈도, 보유 기간 |
 | AI 간 상호작용 | 경쟁 vs 협력 패턴, Emergent behavior, 시장 역학 |
 | 보안 공방 효과성 | RedAgent 공격 성공률, BlueAgent 방어 적중률 |
 | 인간 vs AI 비교 | 실제 인간 트레이더와 성과 비교, AI 강점/약점 분석 |
@@ -350,6 +343,7 @@ gantt
 ## 🛠️ Technology Stack
 
 ### 1. Backend ✅
+
 | 기술 | 용도 |
 |------|------|
 | Python 3.10+ | 백엔드 및 에이전트 주 언어 |
@@ -361,12 +355,14 @@ gantt
 | pykrx | KRX 국내 주식 실시간 시세 |
 
 ### 2. Database
+
 | 기술 | 용도 | 상태 |
 |------|------|------|
 | SQLite | 로컬 개발 환경 | ✅ 완료 |
 | MySQL 8.0 | 프로덕션 환경 (Docker 기반) | 🔄 선택 |
 
 ### 3. Frontend ⏳ Phase 2 예정
+
 | 기술 | 용도 |
 |------|------|
 | React 18+ / TypeScript | SPA 프레임워크 |
@@ -374,16 +370,18 @@ gantt
 | Chart.js / TradingView | 실시간 시세 차트 |
 | WebSocket | 실시간 데이터 연동 |
 
-### 4. Security By Infrastructure  ⏳ Phase 4 예정
-| 기술 | 용도 |
-|------|------|
-| Docker / Docker Compose | 컨테이너화 |
-| GitHub Actions | CI/CD 파이프라인 |
-| Bandit / Semgrep | SAST 보안 스캔 |
-| OWASP ZAP | DAST 보안 스캔 |
-| Azure / AWS | 클라우드 배포 (선택) |
+### 4. Security By Infrastructure 🟡 Phase 4 진행 중
+
+| 기술 | 용도 | 상태 |
+|------|------|------|
+| Docker / Docker Compose | 컨테이너화 | ⏳ 예정 |
+| GitHub Actions | CI/CD 파이프라인 | ✅ 완료 |
+| Bandit / Semgrep | SAST 보안 스캔 | ✅ 완료 |
+| OWASP ZAP | DAST 보안 스캔 | ⏳ 예정 |
+| Azure / AWS | 클라우드 배포 (선택) | ⏳ 예정 |
 
 ### 5. AI/LLM 🟡 Phase 5 강화 예정
+
 | 기술 | 용도 | 상태 |
 |------|------|------|
 | Ollama | 로컬 LLM 실행 (llama3 등) | 🟡 기본 구현 |
@@ -393,16 +391,17 @@ gantt
 
 ---
 
-
 ## 🌐 API 전체 목록
 
 ### 1. Auth
+
 | 메서드 | URL | 기능 | 상태 코드 |
 |--------|-----|------|-----------|
 | POST | `/api/v1/auth/register` | 회원가입 | 201 |
 | POST | `/api/v1/auth/login` | 로그인 (JWT 발급) | 200 |
 
 ### 2. Users
+
 | 메서드 | URL | 기능 | 상태 코드 |
 |--------|-----|------|-----------|
 | GET | `/api/v1/users/` | 사용자 목록 조회 | 200 |
@@ -411,6 +410,7 @@ gantt
 | DELETE | `/api/v1/users/{id}` | 사용자 삭제 | 204 / 404 |
 
 ### 3. Accounts
+
 | 메서드 | URL | 기능 | 상태 코드 |
 |--------|-----|------|-----------|
 | GET | `/api/v1/accounts/` | 계좌 목록 조회 | 200 |
@@ -418,6 +418,7 @@ gantt
 | GET | `/api/v1/accounts/{id}` | 계좌 단건 조회 | 200 / 404 |
 
 ### 4. Orders
+
 | 메서드 | URL | 기능 | 상태 코드 |
 |--------|-----|------|-----------|
 | GET | `/api/v1/orders/` | 주문 목록 조회 | 200 |
@@ -425,24 +426,28 @@ gantt
 | GET | `/api/v1/orders/{id}` | 주문 단건 조회 | 200 / 404 |
 
 ### 5. Positions
+
 | 메서드 | URL | 기능 | 상태 코드 |
 |--------|-----|------|-----------|
 | GET | `/api/v1/positions/` | 포지션 목록 조회 | 200 |
 | GET | `/api/v1/positions/{id}` | 포지션 단건 조회 | 200 / 404 |
 
 ### 6. Market Data
+
 | 메서드 | URL | 기능 | 상태 코드 |
 |--------|-----|------|-----------|
 | GET | `/api/v1/market-data/` | 시세 목록 조회 | 200 |
 | GET | `/api/v1/market-data/{symbol}` | 종목 시세 조회 | 200 / 404 |
 
 ### 7. Agent Logs
+
 | 메서드 | URL | 기능 | 상태 코드 |
 |--------|-----|------|-----------|
 | GET | `/api/v1/agent-logs/` | 에이전트 로그 목록 | 200 |
 | POST | `/api/v1/agent-logs/` | 에이전트 로그 기록 | 201 |
 
 ### 8. Security Events
+
 | 메서드 | URL | 기능 | 상태 코드 |
 |--------|-----|------|-----------|
 | GET | `/api/v1/security-events/` | 보안 이벤트 목록 | 200 |
@@ -453,6 +458,7 @@ gantt
 ## 📐 Domain & Validation Rules
 
 ### 1. Accounts
+
 | 필드 | 타입 | 규칙 |
 |------|------|------|
 | `name` | string | 필수, 빈 문자열 불가 |
@@ -460,6 +466,7 @@ gantt
 | `initial_balance` | float | 필수, `>= 0` |
 
 ### 2. Orders
+
 | 필드 | 타입 | 규칙 |
 |------|------|------|
 | `account_id` | int | 필수, 존재하는 계좌 ID |
@@ -470,6 +477,7 @@ gantt
 | `price` | float | LIMIT 주문 시 필수 `> 0` |
 
 ### 3. 에러 응답
+
 | 상황 | 상태 코드 | 메시지 |
 |------|-----------|--------|
 | `initial_balance` 음수 | 422 | `"Input should be greater than or equal to 0"` |
@@ -483,15 +491,19 @@ gantt
 
 ## 🧪 테스트 현황
 
-### Tests (Phase 1 완료)
+### Tests (Phase 1 + Phase 5 기본 완료)
+
 | 카테고리 | 파일 | 테스트 수 | 상태 |
 |----------|------|-----------|------|
-| Smoke | `test_api_smoke.py` | 19개 | ✅ |
-| Validation | `test_validation.py` | 18개 | ✅ |
-| Integration | `test_integration.py` | 17개 | ✅ |
-| Security | `test_security.py` | 14개 | ✅ |
-| E2E | `test_e2e.py` | 3개 | ✅ |
-| **총합** | | **71개** | **✅ 71/71** |
+| Smoke | `tests/smoke/test_api_smoke.py` | 21개 | ✅ |
+| Validation | `tests/validation/test_validation.py` | 22개 | ✅ |
+| Integration | `tests/integration/test_integration.py` | 7개 | ✅ |
+| Security | `tests/security/test_security.py` | 12개 | ✅ |
+| E2E | `tests/e2e/test_e2e.py` | 5개 | ✅ |
+| Phase2 Agents | `tests/test_phase2_agents.py` | 21개 | ✅ |
+| V1 API | `tests/test_v1.py` | 
+24개 | ✅ |
+| **총합** | | **110개** | **✅ 110/110** |
 
 ---
 
@@ -503,7 +515,8 @@ gantt
 | 입력 검증 | Pydantic v2 스키마 검증 | ✅ Phase 1 완료 |
 | DB 보안 | SQLAlchemy ORM (SQL Injection 방지) | ✅ Phase 1 완료 |
 | 보안 점검 | 취약점 스캔 및 보완 | ⏳ Phase 4 예정 |
-| 보안 스캔 자동화 | SAST/DAST (Bandit, OWASP ZAP) | ⏳ Phase 4 예정 |
+| 보안 스캔 자동화 | SAST (Bandit), Dependency 취약점 스캔 | ✅ Phase 4 완료 |
+| CI/CD 파이프라인 | GitHub Actions (SAST + Pytest + 요약) | ✅ Phase 4 완료 |
 | 공격 시뮬레이션 | RedAgent (OWASP Top 10) | ⏳ Phase 5 예정 |
 | 방어 자동화 | BlueAgent (KISA RAG) | ⏳ Phase 5 예정 |
 
@@ -526,6 +539,7 @@ gantt
 ## 📝 개발 규칙 (Conventions)
 
 ### 1. 네이밍 규칙
+
 | 대상 | 규칙 | 예시 |
 |------|------|------|
 | 디렉터리/폴더 | camelCase | `agenticAi/`, `redAgent/` |
@@ -537,6 +551,7 @@ gantt
 | DB 테이블/컬럼 | snake_case | `agent_logs`, `created_at` |
 
 ### 2. 코드 스타일
+
 - Python: PEP8 준수, Black 포매터
 - 최대 줄 길이: 88자
 - 타입 힌트 필수 (`def func(x: int) -> str:`)
@@ -575,5 +590,3 @@ This project is licensed under the MIT License.
   - [KISA 주요정보통신기반시설 기술적 취약점 분석 가이드](https://www.kisa.or.kr)
   - [FastAPI 공식 문서](https://fastapi.tiangolo.com)
   - [pykrx 공식 문서](https://github.com/sharebook-kr/pykrx)
-
-  
