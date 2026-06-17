@@ -14,7 +14,7 @@
 | Phase | 내용 | 상태 |
 |-------|------|------|
 | **Phase 1** | 백엔드 API / DB / 테스트 체계 | ✅ **완료** (71/71 테스트 통과) |
-| **Phase 2** | Agentic AI Core 라이브러리 | 🔜 진행 예정 |
+| **Phase 2** | Agentic AI Core 라이브러✅ 완료 |
 | **Phase 3** | 5개 에이전트 구현 (Red/Blue/기관/개인A/개인B) | ⏳ 대기 |
 | **Phase 4** | Frontend (투자자용) + Dashboard (운영자용) | ⏳ 대기 |
 | **Phase 5** | Infra / Cloud / CI/CD 배포 | ⏳ 대기 |
