@@ -1,40 +1,37 @@
+
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import asyncio
+from app.database import init_db
+from app.api.v1 import auth, users, accounts, orders, positions, agent_logs, security_events, health
 
-from app.core.config import settings
-from app.database import init_db, SessionLocal
-from app.services.accounts_service import init_all_accounts
-from app.api import health, accounts, orders, instruments
-from app.api.websocket import router as ws_router, market_broadcast_loop
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    print("[APP] DevSecOps Trading Platform v1.0.0 started")
+    yield
 
 app = FastAPI(
-    title=settings.APP_NAME,
-    version=settings.APP_VERSION,
-    debug=settings.DEBUG,
+    title="DevSecOps Trading Platform",
+    version="1.0.0",
+    description="DevSecOps Trading Platform Lab with Agentic AI",
+    redirect_slashes=False,
+    lifespan=lifespan,
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(health.router,      prefix="/api",  tags=["health"])
-app.include_router(accounts.router,    prefix="/api",  tags=["accounts"])
-app.include_router(orders.router,      prefix="/api",  tags=["orders"])
-app.include_router(instruments.router, prefix="/api",  tags=["instruments"])
-app.include_router(ws_router,                          tags=["websocket"])
-
-@app.on_event("startup")
-async def startup():
-    init_db()
-    db = SessionLocal()
-    try:
-        init_all_accounts(db)
-    finally:
-        db.close()
-    asyncio.create_task(market_broadcast_loop())
-    print(f"[APP] {settings.APP_NAME} v{settings.APP_VERSION} started")
+app.include_router(health.router,           prefix="/api/v1")
+app.include_router(auth.router,             prefix="/api/v1")
+app.include_router(users.router,            prefix="/api/v1")
+app.include_router(accounts.router,         prefix="/api/v1")
+app.include_router(orders.router,           prefix="/api/v1")
+app.include_router(positions.router,        prefix="/api/v1")
+app.include_router(agent_logs.router,       prefix="/api/v1")
+app.include_router(security_events.router,  prefix="/api/v1")

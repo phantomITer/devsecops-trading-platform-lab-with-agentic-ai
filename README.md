@@ -13,7 +13,7 @@
 
 | Phase | 내용 | 상태 |
 |-------|------|------|
-| **Phase 1** | 백엔드 API / DB / 테스트 체계 | ✅ **완료** (79/79 테스트 통과) |
+| **Phase 1** | 백엔드 API / DB / 테스트 체계 | ✅ **완료** (71/71 테스트 통과) |
 | **Phase 2** | Agentic AI Core 라이브러리 | 🔜 진행 예정 |
 | **Phase 3** | 5개 에이전트 구현 (Red/Blue/기관/개인A/개인B) | ⏳ 대기 |
 | **Phase 4** | Frontend (투자자용) + Dashboard (운영자용) | ⏳ 대기 |
@@ -60,7 +60,7 @@ cd devsecops-trading-platform-lab-with-agentic-ai
 ```bash
 python -m venv .venv
 
-# Windows (PowerShell)
+# Windows (cmd)
 .\.venv\Scripts\Activate
 
 # macOS / Linux
@@ -87,9 +87,9 @@ uvicorn app.main:app --reload
 
 | 항목 | URL |
 |------|-----|
-| Swagger UI | `http://127.0.0.1:8000/docs` |
-| ReDoc | `http://127.0.0.1:8000/redoc` |
-| 헬스 체크 | `http://127.0.0.1:8000/api/v1/health` |
+| Swagger UI | `http://localhost:8000/docs` |
+| ReDoc | `http://localhost/redoc` |
+| 헬스 체크 | `http://localhost:8000/api/v1/health` |
 
 ### 7. 테스트 실행
 
@@ -184,7 +184,7 @@ pytest tests/ -v
 | `account_id` | int | 필수, 존재하는 계좌 ID여야 함 |
 | `symbol` | string | 필수 (예: `"005930"` 삼성전자) |
 | `side` | string | `"BUY"` 또는 `"SELL"` 만 허용 |
-| `type` | string | `"MARKET"` 또는 `"LIMIT"` 만 허용 |
+| `order_type` | string | `"MARKET"` 또는 `"LIMIT"` 만 허용 |
 | `quantity` | float | 필수, `> 0` |
 | `price` | float | LIMIT 주문 시 필수 `> 0` / MARKET 주문 시 무시 |
 
@@ -278,7 +278,7 @@ pytest tests/ -v
 
 | 파일 | 테스트 수 | 상태 | 설명 |
 |------|-----------|------|------|
-| `test_smoke.py` | 19개 | ✅ 통과 | 전체 API 기본 동작 확인 |
+| `test_api_smoke.py` | 19개 | ✅ 통과 | 전체 API 기본 동작 확인 |
 | `test_validation.py` | 18개 | ✅ 통과 | 데이터 유효성 검증 |
 | `test_integration.py` | 17개 | ✅ 통과 | 계좌→주문 연동 흐름 |
 | `test_security.py` | 14개 | ✅ 통과 | SQL Injection, 인증 우회 등 |
@@ -290,26 +290,18 @@ pytest tests/ -v
 전체 테스트 실행
 
 ```bash
-pytest tests/ -v
+python run_all_tests.py
+pytest tests/ -v  
 ```
 
 카테고리별 실행
 
 ```bash
-pytest tests/test_smoke.py -v
-pytest tests/test_validation.py -v
-pytest tests/test_integration.py -v
-pytest tests/test_security.py -v
-pytest tests/test_e2e.py -v
+python  tests/smoke/test_api_smoke.py -v
+python  tests/validation/test_validation.py -v
+python  tests/integration/test_integration.py -v
+python  tests/e2e/test_e2e.py -v
 ```
-
-커버리지 포함 실행
-
-```bash
-pytest tests/ -v --cov=app --cov-report=html
-```
-
----
 
 ## 🗺️ Roadmap
 
@@ -327,11 +319,11 @@ pytest tests/ -v --cov=app --cov-report=html
 ### 🔜 진행 예정 (Phase 2)
 
 - `agenticAi/core/` 공통 라이브러리 구현
-  - `base_agent.py` - 베이스 에이전트 클래스
-  - `ollama_client.py` - Ollama LLM 클라이언트
-  - `rag_engine.py` - KISA 문서 기반 RAG 엔진
-  - `tool_registry.py` - 공통 툴 레지스트리
-  - `memory.py` - 에이전트 메모리/상태 관리
+  - `base.py` - 베이스 에이전트 클래스
+  - `llm/ollama_client.py` - Ollama LLM 클라이언트
+  - `llm/rag_engine.py` - KISA 문서 기반 RAG 엔진
+  - `tools/` - 공통 툴 레지스트리
+  - `memory_store.py` - 에이전트 메모리/상태 관리
 
 ### 📋 대기 중 (Phase 3)
 
@@ -343,7 +335,7 @@ pytest tests/ -v --cov=app --cov-report=html
 
 ### 📋 대기 중 (Phase 4)
 
-- 투자자용 프론트엔드 (`appFrontEnd/`) - OO증권 UI 스타일
+- 투자자용 프론트엔드 (`appfrontend/`) - OO증권 UI 스타일
 - 운영자 대시보드 (`dashboard/`) - Azure 포털 스타일
   - 에이전트 실시간 모니터링
   - 보안 이벤트 시각화
@@ -382,7 +374,7 @@ pytest tests/ -v --cov=app --cov-report=html
 |--------|-----------|------|
 | `users` | id, username, email, hashed_password | 사용자 |
 | `accounts` | id, user_id, name, currency, balance | 모의 계좌 |
-| `orders` | id, account_id, symbol, side, type, quantity, price, status | 주문 |
+| `orders` | id, account_id, symbol, side, order_type, quantity, price, status |
 | `positions` | id, account_id, symbol, quantity, avg_price | 보유 포지션 |
 | `market_data` | id, symbol, price, volume, timestamp | KRX 시세 |
 | `agent_logs` | id, agent_id, agent_type, action, result, timestamp | 에이전트 로그 |
@@ -396,7 +388,7 @@ pytest tests/ -v --cov=app --cov-report=html
 
 | 대상 | 규칙 | 예시 |
 |------|------|------|
-| 디렉터리/폴더 | camelCase | `agenticAi/`, `redAgent/`, `appFrontEnd/` |
+| 디렉터리/폴더 | camelCase | `agenticAi/`, `redAgent/` |
 | Python 파일 | snake_case | `base_agent.py`, `red_agent.py` |
 | Python 클래스 | PascalCase | `BaseAgent`, `RedAgent` |
 | Python 함수/변수 | snake_case | `get_account()`, `agent_id` |

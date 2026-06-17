@@ -1,143 +1,164 @@
-# tests/smoke/test_api_smoke.py
 
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import requests
-from tests.utils.base import check, save_history, print_summary
+from tests.utils.base import check as _chk, save_history, print_summary
 
 BASE_URL = "http://127.0.0.1:8000"
-
 
 def run_tests():
     results = []
 
+    def check(name, condition, detail=""):
+        _chk(results, name, condition, detail)
+
     print("\n" + "=" * 60)
     print("Smoke Test 시작")
-    print("=" * 60 + "\n")
+    print("=" * 60)
 
-    # ──────────────────────────────────────────────
-    # 1. Health
-    # ──────────────────────────────────────────────
-    print("[ Health ]")
-    r = requests.get(f"{BASE_URL}/api/health")
-    check(results, "GET /api/health → 200", r.status_code == 200, str(r.json()))
+    # Health
+    print("\n[ Health ]")
+    r = requests.get(f"{BASE_URL}/api/v1/health/")
+    check("GET /api/v1/health/ → 200", r.status_code == 200)
 
-    # ──────────────────────────────────────────────
-    # 2. Accounts
-    # ──────────────────────────────────────────────
-    print("\n[ Accounts ]")
-
-    r = requests.post(f"{BASE_URL}/api/accounts", json={
-        "name": "Test Account",
-        "currency": "USD",
-        "initial_balance": 10000
+    # Auth
+    print("\n[ Auth ]")
+    r = requests.post(f"{BASE_URL}/api/v1/auth/register", json={
+        "username": "smokeuser",
+        "email": "smoke@test.com",
+        "password": "smoke1234"
     })
-    check(results, "POST /api/accounts → 201", r.status_code == 201, str(r.json()))
+    check("POST /api/v1/auth/register → 201", r.status_code == 201, str(r.json()))
+
+    r = requests.post(f"{BASE_URL}/api/v1/auth/login", json={
+        "username": "smokeuser",
+        "password": "smoke1234"
+    })
+    check("POST /api/v1/auth/login → 200", r.status_code == 200)
+    token = r.json().get("access_token") if r.status_code == 200 else None
+
+    r = requests.post(f"{BASE_URL}/api/v1/auth/login", json={
+        "username": "smokeuser",
+        "password": "wrongpass"
+    })
+    check("POST /api/v1/auth/login (wrong pw) → 401", r.status_code == 401)
+
+    # Accounts
+    print("\n[ Accounts ]")
+    r = requests.post(f"{BASE_URL}/api/v1/accounts/", json={
+        "name": "Smoke Account",
+        "currency": "KRW",
+        "initial_balance": 1000000
+    })
+    check("POST /api/v1/accounts/ → 201", r.status_code == 201, str(r.json()))
     account_id = r.json().get("id") if r.status_code == 201 else None
 
-    r = requests.get(f"{BASE_URL}/api/accounts")
-    check(results, "GET /api/accounts → 200", r.status_code == 200, f"{len(r.json())}개")
+    r = requests.get(f"{BASE_URL}/api/v1/accounts/")
+    check("GET /api/v1/accounts/ → 200", r.status_code == 200)
 
     if account_id:
-        r = requests.get(f"{BASE_URL}/api/accounts/{account_id}")
-        check(results, f"GET /api/accounts/{account_id} → 200", r.status_code == 200)
+        r = requests.get(f"{BASE_URL}/api/v1/accounts/{account_id}")
+        check(f"GET /api/v1/accounts/{account_id} → 200", r.status_code == 200)
 
-    r = requests.get(f"{BASE_URL}/api/accounts/9999")
-    check(results, "GET /api/accounts/9999 → 404", r.status_code == 404)
+    r = requests.get(f"{BASE_URL}/api/v1/accounts/9999")
+    check("GET /api/v1/accounts/9999 → 404", r.status_code == 404)
 
-    r = requests.post(f"{BASE_URL}/api/accounts", json={
-        "name": "Bad Account",
-        "currency": "USD",
+    r = requests.post(f"{BASE_URL}/api/v1/accounts/", json={
+        "name": "Bad",
+        "currency": "KRW",
         "initial_balance": -1
     })
-    check(results, "POST /api/accounts (initial_balance=-1) → 4xx", r.status_code in (400, 422))
+    check("POST /api/v1/accounts/ (음수잔고) → 422", r.status_code == 422)
 
-    # ──────────────────────────────────────────────
-    # 3. Orders
-    # ──────────────────────────────────────────────
+    # Orders
     print("\n[ Orders ]")
-
-    r = requests.post(f"{BASE_URL}/api/orders", json={
+    r = requests.post(f"{BASE_URL}/api/v1/orders/", json={
         "account_id": account_id,
-        "symbol": "AAPL",
+        "symbol": "005930",
         "side": "BUY",
-        "type": "LIMIT",
+        "order_type": "LIMIT",
         "quantity": 10,
-        "price": 190.5
+        "price": 75000
     })
-    check(results, "POST /api/orders → 201", r.status_code == 201, str(r.json()))
+    check("POST /api/v1/orders/ → 201", r.status_code == 201)
     order_id = r.json().get("id") if r.status_code == 201 else None
 
-    r = requests.get(f"{BASE_URL}/api/orders")
-    check(results, "GET /api/orders → 200", r.status_code == 200, f"{len(r.json())}개")
+    r = requests.get(f"{BASE_URL}/api/v1/orders/")
+    check("GET /api/v1/orders/ → 200", r.status_code == 200)
 
     if order_id:
-        r = requests.get(f"{BASE_URL}/api/orders/{order_id}")
-        check(results, f"GET /api/orders/{order_id} → 200", r.status_code == 200)
+        r = requests.get(f"{BASE_URL}/api/v1/orders/{order_id}")
+        check(f"GET /api/v1/orders/{order_id} → 200", r.status_code == 200)
 
-    r = requests.get(f"{BASE_URL}/api/orders/9999")
-    check(results, "GET /api/orders/9999 → 404", r.status_code == 404)
+    r = requests.get(f"{BASE_URL}/api/v1/orders/9999")
+    check("GET /api/v1/orders/9999 → 404", r.status_code == 404)
 
-    r = requests.post(f"{BASE_URL}/api/orders", json={
+    r = requests.post(f"{BASE_URL}/api/v1/orders/", json={
         "account_id": account_id,
-        "symbol": "AAPL",
+        "symbol": "005930",
         "side": "BUY",
-        "type": "LIMIT",
-        "quantity": -1,
-        "price": 190.5
+        "order_type": "LIMIT",
+        "quantity": 0
     })
-    check(results, "POST /api/orders (quantity=-1) → 4xx", r.status_code in (400, 422))
+    check("POST /api/v1/orders/ (quantity=0) → 422", r.status_code == 422)
 
-    r = requests.post(f"{BASE_URL}/api/orders", json={
+    r = requests.post(f"{BASE_URL}/api/v1/orders/", json={
         "account_id": account_id,
-        "symbol": "AAPL",
+        "symbol": "005930",
         "side": "BUY",
-        "type": "LIMIT",
+        "order_type": "LIMIT",
         "quantity": 10
     })
-    check(results, "POST /api/orders (LIMIT, price 없음) → 4xx", r.status_code in (400, 422))
+    check("POST /api/v1/orders/ (LIMIT, price 없음) → 400", r.status_code == 400)
 
-    r = requests.post(f"{BASE_URL}/api/orders", json={
+    r = requests.post(f"{BASE_URL}/api/v1/orders/", json={
         "account_id": 9999,
-        "symbol": "AAPL",
+        "symbol": "005930",
         "side": "BUY",
-        "type": "MARKET",
+        "order_type": "MARKET",
         "quantity": 10
     })
-    check(results, "POST /api/orders (account_id=9999) → 400", r.status_code == 400)
+    check("POST /api/v1/orders/ (없는 account) → 400", r.status_code == 400)
 
-    # ──────────────────────────────────────────────
-    # 4. Instruments
-    # ──────────────────────────────────────────────
-    print("\n[ Instruments ]")
+    # Positions
+    print("\n[ Positions ]")
+    r = requests.get(f"{BASE_URL}/api/v1/positions/")
+    check("GET /api/v1/positions/ → 200", r.status_code == 200)
 
-    r = requests.get(f"{BASE_URL}/api/instruments")
-    check(results, "GET /api/instruments → 200", r.status_code == 200, f"{len(r.json())}개")
+    r = requests.get(f"{BASE_URL}/api/v1/positions/9999")
+    check("GET /api/v1/positions/9999 → 404", r.status_code == 404)
 
-    r = requests.get(f"{BASE_URL}/api/instruments?market=KOSPI")
-    check(results, "GET /api/instruments?market=KOSPI → 200", r.status_code == 200, f"{len(r.json())}개")
+    # Agent Logs
+    print("\n[ Agent Logs ]")
+    r = requests.post(f"{BASE_URL}/api/v1/agent-logs/", json={
+        "agent_id": "red-smoke-001",
+        "agent_type": "red",
+        "action": "A03_SQL_INJECTION",
+        "result": "simulated"
+    })
+    check("POST /api/v1/agent-logs/ → 201", r.status_code == 201)
 
-    r = requests.get(f"{BASE_URL}/api/instruments?q=삼성")
-    check(results, "GET /api/instruments?q=삼성 → 200", r.status_code == 200, f"{len(r.json())}개")
+    r = requests.get(f"{BASE_URL}/api/v1/agent-logs/")
+    check("GET /api/v1/agent-logs/ → 200", r.status_code == 200)
 
-    r = requests.get(f"{BASE_URL}/api/instruments/AAPL")
-    check(results, "GET /api/instruments/AAPL → 200", r.status_code == 200)
+    # Security Events
+    print("\n[ Security Events ]")
+    r = requests.post(f"{BASE_URL}/api/v1/security-events/", json={
+        "event_type": "ATTACK",
+        "severity": "HIGH",
+        "source": "red-agent",
+        "description": "SQL Injection 탐지"
+    })
+    check("POST /api/v1/security-events/ → 201", r.status_code == 201)
 
-    r = requests.get(f"{BASE_URL}/api/instruments/aapl")
-    check(results, "GET /api/instruments/aapl → 200 (대소문자 무시)", r.status_code == 200)
+    r = requests.get(f"{BASE_URL}/api/v1/security-events/")
+    check("GET /api/v1/security-events/ → 200", r.status_code == 200)
 
-    r = requests.get(f"{BASE_URL}/api/instruments/XYZ")
-    check(results, "GET /api/instruments/XYZ → 404", r.status_code == 404)
-
-    # ──────────────────────────────────────────────
-    # 결과 요약 + 이력 저장
-    # ──────────────────────────────────────────────
     passed, failed = print_summary(results, "Smoke")
     save_history("smoke/test_api_smoke.py", results)
     return passed, failed
-
 
 if __name__ == "__main__":
     run_tests()
