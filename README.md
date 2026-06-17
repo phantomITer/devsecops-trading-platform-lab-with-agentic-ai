@@ -1,6 +1,6 @@
 # DevSecOps Trading Platform Lab with Agentic AI
 
-현재는 진보하는 AI기반 사이버공격에 대한 두려움과 경각심을 가지고 있습니다. 안전하고 신뢰성 있는 **"모의 증권거래 플랫폼"**을 구현하면서 DevSecOps with Agentic AI 거버넌스를 조성하고 Agentic AI의 행동 연구를 수행하고자 추진된 개인 프로젝트입니다.
+우리는 진보하는 AI기반 사이버공격에 대한 두려움과 경각심을 가지고 있습니다. 안전하고 신뢰성 있는 **"모의 증권거래 플랫폼"**을 구현하면서 DevSecOps with Agentic AI 거버넌스를 조성하고 Agentic AI의 행동 연구를 수행하고자 추진된 개인 프로젝트입니다.
 
 > ⚠️ **면책조항**
 > 본 프로젝트는 교육 및 역량강화 목적입니다. 사이버 범죄 영감 획득, 악성 행위 활용 등은 국내외 법에 따른 처벌 대상이며, 프로젝트 작성자는 책임을 지지 않습니다.
@@ -114,8 +114,8 @@ pytest tests/e2e/ -v
 | **👥 거래 참여자** | 🏦 InstitutionalAgent | 기관투자자 | 블록 거래, TWAP/VWAP 전략 |
 | | 👤 RetailAgentA | 개인투자자 A | 가치투자 (Buy-the-Dip) |
 | | 👤 RetailAgentB | 개인투자자 B | 모멘텀 (FOMO Trading) |
-| **🛡️ 보안 레이어** | 🔵 BlueAgent | 방어 시스템 | 위협 탐지, KISA 가이드 기반 대응 |
-| | 🔴 RedAgent | 공격 시뮬레이션 | OWASP Top 10 공격 |
+| **🛡️ 보안 레이어** | 🔵 BlueAgent | Agentic AI 방어자 | 위협 탐지, KISA 가이드 기반 대응 |
+| | 🔴 RedAgent | Agentic AI 공격자 | OWASP Top 10 공격 |
 
 ### 2. 개발 철학
 
@@ -192,10 +192,10 @@ graph TB
     B4 --> E5
     D4 --> E4
 
-    classDef completed fill:#90EE90,stroke:#006400,stroke-width:2px
-    classDef inProgress fill:#FFD700,stroke:#FF8C00,stroke-width:2px
-    classDef waiting fill:#E8E8E8,stroke:#808080,stroke-width:1px
-    classDef partial fill:#FFE4B5,stroke:#FF8C00,stroke-width:2px
+    classDef completed fill:#1a5c1a,stroke:#90EE90,stroke-width:2px,color:#ffffff
+    classDef inProgress fill:#7a5c00,stroke:#FFD700,stroke-width:2px,color:#ffffff
+    classDef waiting fill:#2a2a2a,stroke:#888888,stroke-width:1px,color:#cccccc
+    classDef partial fill:#7a3d00,stroke:#FFA500,stroke-width:2px,color:#ffffff
 
     class A1,A2,A3,A4,A6 completed
     class A5 inProgress
@@ -212,36 +212,37 @@ graph TB
 gantt
     title Phase 개발 타임라인
     dateFormat YYYY-MM-DD
+    tickInterval 1month
 
-    section Phase 1 - Backend
-    Backend Core (완료)          :done,   p1-1, 2026-06-16, 2026-06-17
-    MySQL 전환 (진행중)           :active, p1-2, 2026-06-17, 2026-06-18
+    section P1-Backend
+    Backend Core (완료)    :done,   p1-1, 2026-06-16, 2026-06-17
+    MySQL 전환             :active, p1-2, 2026-06-17, 2026-06-18
 
-    section Phase 2 - Frontend
-    투자자 거래 UI               :        p2-1, 2026-06-25, 21d
-    포트폴리오 대시보드           :        p2-2, after p2-1, 14d
-    운영자 모니터링 UI            :        p2-3, after p2-2, 14d
-    실시간 시세 기본              :        p2-4, after p2-1, 14d
+    section P2-Frontend
+    투자자 UI              :        p2-1, 2026-06-25, 21d
+    포트폴리오             :        p2-2, after p2-1, 14d
+    운영자 UI              :        p2-3, after p2-2, 14d
+    실시간 시세            :        p2-4, after p2-1, 14d
 
-    section Phase 3 - Validation
-    E2E 테스트                   :        p3-1, after p2-3, 10d
-    성능/부하 테스트              :        p3-2, after p3-1, 7d
-    사용자 수용 테스트            :        p3-3, after p3-2, 7d
+    section P3-Validation
+    E2E 테스트             :        p3-1, after p2-3, 10d
+    성능/부하              :        p3-2, after p3-1, 7d
+    UAT                    :        p3-3, after p3-2, 7d
 
-    section Phase 4 - DevSecOps
-    보안 점검 및 보완             :        p4-1, after p3-3, 7d
-    SAST/DAST 자동화             :        p4-2, after p4-1, 7d
-    Docker 컨테이너화            :        p4-3, after p4-2, 7d
-    CI/CD 파이프라인             :        p4-4, after p4-3, 7d
-    클라우드 배포 선택            :        p4-5, after p4-4, 14d
+    section P4-DevSecOps
+    보안 점검              :        p4-1, after p3-3, 7d
+    SAST/DAST             :        p4-2, after p4-1, 7d
+    Docker                 :        p4-3, after p4-2, 7d
+    CI/CD                  :        p4-4, after p4-3, 7d
+    클라우드               :        p4-5, after p4-4, 14d
 
-    section Phase 5 - Agentic AI
-    AI 인프라 (기본 완료)         :done,   p5-1, 2026-07-01, 2026-07-05
-    LLM Provider 추상화          :        p5-2, after p4-4, 14d
-    거래 Agentic AI 고도화       :        p5-3, after p5-2, 21d
-    보안 Agentic AI 고도화       :        p5-4, after p5-2, 21d
-    Multi-Agent 시뮬레이션       :        p5-5, after p5-3, 14d
-    AI 행동 연구                 :        p5-6, after p5-5, 30d
+    section P5-AgenticAI
+    AI 인프라 (완료)       :done,   p5-1, 2026-07-01, 2026-07-05
+    LLM 추상화             :        p5-2, after p4-4, 14d
+    거래 AI                :        p5-3, after p5-2, 21d
+    보안 AI                :        p5-4, after p5-2, 21d
+    Multi-Agent            :        p5-5, after p5-3, 14d
+    AI 행동 연구           :        p5-6, after p5-5, 30d
 ```
 
 
