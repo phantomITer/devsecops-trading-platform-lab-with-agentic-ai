@@ -4,8 +4,8 @@ from datetime import datetime
 
 class AccountCreate(BaseModel):
     name: str
-    currency: str = "KRW"
-    initial_balance: float = 0.0
+    currency: str                    # 필수 - 누락 시 422
+    initial_balance: float = 0.0    # 0은 합리적 기본값이므로 유지
 
     @field_validator("name")
     @classmethod

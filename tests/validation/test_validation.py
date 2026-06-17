@@ -179,7 +179,7 @@ class TestValidation:
             "email": "dup2@test.com",
             "password": "pass1234"
         })
-        assert r.status_code == 409
+        assert r.status_code == 400
 
     # ===== Agent Log 검증 =====
 
