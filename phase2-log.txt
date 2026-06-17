@@ -1,0 +1,377 @@
+02b9fb2 (origin/main, origin/HEAD) Phase2: add core __init__.py public API exports
+ agenticAi/core/__init__.py | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+386f298 Phase2: implement PortfolioTool position query helper
+ agenticAi/core/tools/portfolio.py | 91 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 91 insertions(+)
+011b7c7 Phase2: implement AlertTool security event create/query
+ agenticAi/core/tools/alert.py | 140 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 140 insertions(+)
+40413f1 Phase2: implement OrderTool place/cancel/get order
+ agenticAi/core/tools/order.py | 128 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 128 insertions(+)
+7ba62b8 Phase2: implement MarketDataTool DB query wrapper
+ agenticAi/core/tools/market_data.py | 123 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 123 insertions(+)
+dc404c2 Phase2: implement RagEngine keyword-based RAG with OllamaClient
+ agenticAi/core/llm/rag_engine.py | 200 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 200 insertions(+)
+fd8e841 Phase2: implement OllamaClient HTTP wrapper for local LLM
+ agenticAi/core/llm/ollama_client.py | 151 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 151 insertions(+)
+c581b92 (HEAD -> main) Phase2: implement MemoryStore thread-safe key-value store
+ agenticAi/core/memory_store.py | 97 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 97 insertions(+)
+bdc4a8d Phase2: implement BaseAgent abstract base class
+ agenticAi/core/base.py | 148 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 148 insertions(+)
+6ea96a4 Update README.md
+ README.md | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+01215bc revised phase1 job completed
+ README.md                                          |   50 +-
+ agenticAi/{blue => blueAgent}/__init__.py          |    0
+ agenticAi/{blue => blueAgent}/analyzer.py          |    0
+ agenticAi/{blue => blueAgent}/blue.py              |    0
+ agenticAi/{blue => blueAgent}/kisaRag/__init__.py  |    0
+ agenticAi/{blue => blueAgent}/kisaRag/loader.py    |    0
+ agenticAi/{blue => blueAgent}/kisaRag/retriever.py |    0
+ .../{blue => blueAgent}/kisaRag/vector_store.py    |    0
+ agenticAi/{blue => blueAgent}/reporter.py          |    0
+ agenticAi/{blue => blueAgent}/scanner/__init__.py  |    0
+ agenticAi/{blue => blueAgent}/scanner/api.py       |    0
+ agenticAi/{blue => blueAgent}/scanner/auth.py      |    0
+ agenticAi/{blue => blueAgent}/scanner/config.py    |    0
+ agenticAi/{blue => blueAgent}/scanner/web.py       |    0
+ agenticAi/core/llm/{prompts.py => rag_engine.py}   |    0
+ .../README.md => core/memory_store.py}             |    0
+ agenticAi/{red => institutionalAgent}/README.md    |    0
+ .../institutional.py                               |    0
+ .../requirements.txt                               |    0
+ .../{institutional => institutionalAgent}/run.py   |    0
+ agenticAi/{retailA => redAgent}/README.md          |    0
+ agenticAi/{red => redAgent}/__init__.py            |    0
+ agenticAi/{red => redAgent}/base_agent.py          |    0
+ agenticAi/{red => redAgent}/logger.py              |    0
+ agenticAi/{red => redAgent}/owasp/__init__.py      |    0
+ .../owasp/a01_broken_access_control.py             |    0
+ .../owasp/a02_cryptographic_failures.py            |    0
+ agenticAi/{red => redAgent}/owasp/a03_injection.py |    0
+ .../{red => redAgent}/owasp/a04_insecure_design.py |    0
+ .../owasp/a05_security_misconfiguration.py         |    0
+ .../owasp/a06_vulnerable_components.py             |    0
+ .../{red => redAgent}/owasp/a07_auth_failures.py   |    0
+ .../owasp/a08_software_integrity_failures.py       |    0
+ .../owasp/a09_logging_failures.py                  |    0
+ agenticAi/{red => redAgent}/owasp/a10_ssrf.py      |    0
+ agenticAi/{red => redAgent}/planner.py             |    0
+ agenticAi/{red => redAgent}/red.py                 |    0
+ agenticAi/{red => redAgent}/requirements.txt       |    0
+ agenticAi/{red => redAgent}/run.py                 |    0
+ agenticAi/{retailB => retailAgentA}/README.md      |    0
+ .../{retailA => retailAgentA}/requirements.txt     |    0
+ agenticAi/{retailA => retailAgentA}/retail_a.py    |    0
+ agenticAi/{retailA => retailAgentA}/run.py         |    0
+ .../requirements.txt => retailAgentB/README.md}    |    0
+ .../retail_b.py => retailAgentB/requirements.txt}  |    0
+ .../{retailB/run.py => retailAgentB/retail_b.py}   |    0
+ agenticAi/retailAgentB/run.py                      |    0
+ app/api/v1/__init__.py                             |    0
+ app/api/v1/accounts.py                             |   21 +
+ app/api/v1/agent_logs.py                           |   17 +
+ app/api/v1/auth.py                                 |   16 +
+ app/api/v1/health.py                               |    8 +
+ app/api/v1/orders.py                               |   21 +
+ app/api/v1/positions.py                            |   17 +
+ app/api/v1/security_events.py                      |   17 +
+ app/api/v1/users.py                                |   22 +
+ app/core/security.py                               |   55 +-
+ app/database.py                                    |   25 +-
+ app/main.py                                        |   49 +-
+ app/models/__init__.py                             |   10 +-
+ app/models/account.py                              |   18 +
+ app/models/agent_log.py                            |   13 +
+ app/models/order.py                                |   18 +
+ app/models/position.py                             |   15 +
+ app/models/security_event.py                       |   13 +
+ app/models/user.py                                 |   15 +
+ app/schemas/account.py                             |   31 +
+ app/schemas/agent_log.py                           |   19 +
+ app/schemas/order.py                               |   40 +
+ app/schemas/position.py                            |   12 +
+ app/schemas/security_event.py                      |   19 +
+ app/schemas/user.py                                |   31 +
+ app/services/accounts_service.py                   |  110 +-
+ app/services/agent_log_service.py                  |   19 +
+ app/services/orders_service.py                     |  132 +--
+ app/services/positions_service.py                  |   13 +
+ app/services/security_event_service.py             |   19 +
+ app/services/user_service.py                       |   45 +
+ docs/jobProcess.md                                 |  420 --------
+ docs/jobProcessed.md                               |  120 ---
+ fixCheckPycodeTemp/Phase1/conftest.py              |    4 +
+ fixCheckPycodeTemp/Phase1/fix_save_history.py      |  118 +++
+ fixCheckPycodeTemp/Phase1/fix_tests_v1.py          |   75 ++
+ fixCheckPycodeTemp/Phase1/fix_warnings.py          |  398 ++++++++
+ fixCheckPycodeTemp/Phase1/jobObject/job.md         |  192 ++++
+ fixCheckPycodeTemp/Phase1/new_update/overview.md   |   22 -
+ fixCheckPycodeTemp/Phase1/new_update/restJob.md    |  286 ------
+ fixCheckPycodeTemp/Phase1/new_update/resultJob.md  |  170 ----
+ fixCheckPycodeTemp/Phase1/rebuild_phase1.py        | 1062 ++++++++++++++++++++
+ fixCheckPycodeTemp/Phase1/run_all_tests.py         |   33 +
+ fixCheckPycodeTemp/Phase1/update_legacy_tests.py   |  717 +++++++++++++
+ pytest.ini                                         |    3 +
+ requirements.txt                                   |   31 +-
+ tests/e2e/e2e_TEST_HISTORY_20260617_161445.md      |   28 +
+ tests/e2e/e2e_TEST_HISTORY_20260617_161517.md      |   28 +
+ tests/e2e/e2e_TEST_HISTORY_20260617_163010.md      |   28 +
+ tests/e2e/test_e2e.py                              |  152 +--
+ .../integration_TEST_HISTORY_20260617_161444.md    |   28 +
+ .../integration_TEST_HISTORY_20260617_161515.md    |   28 +
+ .../integration_TEST_HISTORY_20260617_163001.md    |   28 +
+ tests/integration/test_integration.py              |  159 +--
+ .../security_TEST_HISTORY_20260617_161445.md       |   23 +
+ .../security_TEST_HISTORY_20260617_161516.md       |   23 +
+ tests/security/test_security.py                    |  179 +---
+ tests/smoke/smoke_TEST_HISTORY_20260617_161443.md  |   36 +
+ tests/smoke/smoke_TEST_HISTORY_20260617_161515.md  |   36 +
+ tests/smoke/smoke_TEST_HISTORY_20260617_162215.md  |   36 +
+ tests/smoke/smoke_TEST_HISTORY_20260617_162943.md  |   36 +
+ tests/smoke/test_api_smoke.py                      |  195 ++--
+ tests/test_v1.py                                   |  216 ++++
+ tests/validation/test_validation.py                |  199 ++--
+ .../validation_TEST_HISTORY_20260617_161444.md     |   26 +
+ .../validation_TEST_HISTORY_20260617_161516.md     |   26 +
+ .../validation_TEST_HISTORY_20260617_162949.md     |   26 +
+ 114 files changed, 4321 insertions(+), 1776 deletions(-)
+d1f534c Update README.md
+ README.md | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+47531c7 Phase1 completed
+ README.md                                          | 613 +++++++++++----------
+ app/adapters/krx_fetcher.py                        | 111 ++++
+ app/adapters/mock_generator.py                     |  88 +++
+ app/api/accounts.py                                |   6 +-
+ app/api/health.py                                  |  25 +-
+ app/api/instruments.py                             |   2 +-
+ app/api/orders.py                                  |   6 +-
+ app/api/websocket.py                               |  53 ++
+ app/api/websockets.py                              |  80 ++-
+ app/core/config.py                                 |  55 ++
+ app/core/dependencies.py                           |  35 ++
+ app/core/security.py                               |  28 +
+ app/database.py                                    |  13 +
+ app/main.py                                        |  45 +-
+ app/models/__init__.py                             |   5 +
+ app/models/accounts.py                             |  18 +
+ app/models/instruments.py                          |  19 +
+ app/models/orders.py                               |  31 ++
+ app/schemas/accounts.py                            |   6 +-
+ app/services/accounts_service.py                   |  99 +++-
+ app/services/accountsservice.py                    |  30 +
+ app/services/orders_service.py                     | 102 ++--
+ app/services/ordersservice.py                      |  28 +
+ docs/jobProcessed.md                               | 120 ++++
+ docs/naming.md                                     |   4 +
+ fixCheckPycodeTemp/Phase1/check_routes.py          |   6 +
+ fixCheckPycodeTemp/Phase1/debug_main.py            |  82 +++
+ fixCheckPycodeTemp/Phase1/fix_check.py             |  12 +
+ fixCheckPycodeTemp/Phase1/fix_failures.py          | 108 ++++
+ fixCheckPycodeTemp/Phase1/fix_init_accounts.py     |  22 +
+ fixCheckPycodeTemp/Phase1/fix_main.py              |  40 ++
+ fixCheckPycodeTemp/Phase1/fix_main2.py             |  46 ++
+ fixCheckPycodeTemp/Phase1/fix_unique.py            |  96 ++++
+ fixCheckPycodeTemp/Phase1/fix_validation_test.py   |  23 +
+ fixCheckPycodeTemp/Phase1/new_update/overview.md   |  22 +
+ fixCheckPycodeTemp/Phase1/new_update/restJob.md    | 286 ++++++++++
+ fixCheckPycodeTemp/Phase1/new_update/resultJob.md  | 170 ++++++
+ fixCheckPycodeTemp/Phase1/setup_files.py           | 372 +++++++++++++
+ fixCheckPycodeTemp/Phase1/setup_services.py        | 186 +++++++
+ fixCheckPycodeTemp/Phase1/test_imports.py          |  63 +++
+ fixCheckPycodeTemp/Phase1/verify_db.py             |  20 +
+ tests/e2e/e2e_TEST_HISTORY_20260616_231251.md      |  33 ++
+ tests/e2e/e2e_TEST_HISTORY_20260616_231808.md      |  33 ++
+ tests/e2e/e2e_TEST_HISTORY_20260616_231842.md      |  33 ++
+ tests/e2e/e2e_TEST_HISTORY_20260616_232216.md      |  33 ++
+ tests/e2e/e2e_TEST_HISTORY_20260616_232342.md      |  33 ++
+ tests/e2e/e2e_TEST_HISTORY_20260616_232854.md      |  33 ++
+ tests/e2e/e2e_TEST_HISTORY_20260616_233717.md      |  33 ++
+ .../integration_TEST_HISTORY_20260616_231231.md    |  29 +
+ .../integration_TEST_HISTORY_20260616_232851.md    |  29 +
+ .../integration_TEST_HISTORY_20260616_233713.md    |  29 +
+ .../security_TEST_HISTORY_20260616_231245.md       |  26 +
+ .../security_TEST_HISTORY_20260616_233714.md       |  26 +
+ tests/smoke/smoke_TEST_HISTORY_20260616_224627.md  |  31 ++
+ tests/smoke/smoke_TEST_HISTORY_20260616_224755.md  |  31 ++
+ tests/smoke/smoke_TEST_HISTORY_20260616_224808.md  |  31 ++
+ tests/smoke/smoke_TEST_HISTORY_20260616_225307.md  |  31 ++
+ tests/smoke/smoke_TEST_HISTORY_20260616_230644.md  |  33 ++
+ tests/smoke/smoke_TEST_HISTORY_20260616_233713.md  |  33 ++
+ tests/validation/test_validation.py                |   5 +-
+ .../validation_TEST_HISTORY_20260616_231239.md     |  28 +
+ .../validation_TEST_HISTORY_20260616_231806.md     |  28 +
+ .../validation_TEST_HISTORY_20260616_231837.md     |  28 +
+ .../validation_TEST_HISTORY_20260616_232338.md     |  28 +
+ .../validation_TEST_HISTORY_20260616_233350.md     |  28 +
+ .../validation_TEST_HISTORY_20260616_233606.md     |  28 +
+ .../validation_TEST_HISTORY_20260616_233643.md     |  28 +
+ .../validation_TEST_HISTORY_20260616_233714.md     |  28 +
+ .../validation_TEST_HISTORY_20260616_233834.md     |  28 +
+ 69 files changed, 3589 insertions(+), 404 deletions(-)
+5582e1e Directory-file components created
+ agenticAi/blue/__init__.py                         |   0
+ agenticAi/blue/analyzer.py                         |   0
+ agenticAi/blue/blue.py                             |   0
+ agenticAi/blue/kisaRag/__init__.py                 |   0
+ agenticAi/blue/kisaRag/loader.py                   |   0
+ agenticAi/blue/kisaRag/retriever.py                |   0
+ agenticAi/blue/kisaRag/vector_store.py             |   0
+ agenticAi/blue/reporter.py                         |   0
+ agenticAi/blue/scanner/__init__.py                 |   0
+ agenticAi/blue/scanner/api.py                      |   0
+ agenticAi/blue/scanner/auth.py                     |   0
+ agenticAi/blue/scanner/config.py                   |   0
+ agenticAi/blue/scanner/web.py                      |   0
+ agenticAi/core/__init__.py                         |   0
+ agenticAi/core/base.py                             |   0
+ agenticAi/core/llm/__init__.py                     |   0
+ agenticAi/core/llm/ollama_client.py                |   0
+ agenticAi/core/llm/prompts.py                      |   0
+ agenticAi/core/requriements.txt                    |   0
+ agenticAi/core/setup.py                            |   0
+ agenticAi/core/tools/__init__.py                   |   0
+ agenticAi/core/tools/alert.py                      |   0
+ agenticAi/core/tools/market_data.py                |   0
+ agenticAi/core/tools/order.py                      |   0
+ agenticAi/core/tools/portfolio.py                  |   0
+ agenticAi/institutional/README.md                  |   0
+ agenticAi/institutional/institutional.py           |   0
+ agenticAi/institutional/requirements.txt           |   0
+ agenticAi/institutional/run.py                     |   0
+ agenticAi/red/README.md                            |   0
+ agenticAi/red/__init__.py                          |   0
+ agenticAi/red/base_agent.py                        |   0
+ agenticAi/red/logger.py                            |   0
+ agenticAi/red/owasp/__init__.py                    |   0
+ agenticAi/red/owasp/a01_broken_access_control.py   |   0
+ agenticAi/red/owasp/a02_cryptographic_failures.py  |   0
+ agenticAi/red/owasp/a03_injection.py               |   0
+ agenticAi/red/owasp/a04_insecure_design.py         |   0
+ .../red/owasp/a05_security_misconfiguration.py     |   0
+ agenticAi/red/owasp/a06_vulnerable_components.py   |   0
+ agenticAi/red/owasp/a07_auth_failures.py           |   0
+ .../red/owasp/a08_software_integrity_failures.py   |   0
+ agenticAi/red/owasp/a09_logging_failures.py        |   0
+ agenticAi/red/owasp/a10_ssrf.py                    |   0
+ agenticAi/red/planner.py                           |   0
+ agenticAi/red/red.py                               |   0
+ agenticAi/red/requirements.txt                     |   0
+ agenticAi/red/run.py                               |   0
+ agenticAi/retailA/README.md                        |   0
+ agenticAi/retailA/requirements.txt                 |   0
+ agenticAi/retailA/retail_a.py                      |   0
+ agenticAi/retailA/run.py                           |   0
+ agenticAi/retailB/README.md                        |   0
+ agenticAi/retailB/requirements.txt                 |   0
+ agenticAi/retailB/retail_b.py                      |   0
+ agenticAi/retailB/run.py                           |   0
+ app/adapters/_future/binance_ws.py                 |   0
+ app/adapters/_future/us_stock_fetcher.py           |   0
+ app/adapters/krx_fetcher.py                        |   0
+ app/adapters/mock_generator.py                     |   0
+ app/api/websockets.py                              |  27 ++
+ app/core/__init__.py                               |   0
+ app/core/config.py                                 |   0
+ app/core/dependencies.py                           |   0
+ app/core/security.py                               |   0
+ app/database.py                                    |   0
+ app/models/__init__.py                             |   0
+ app/models/accounts.py                             |   0
+ app/models/instruments.py                          |   0
+ app/models/orders.py                               |   0
+ appfrontend/package.json                           |   0
+ appfrontend/public/index.html                      |   0
+ .../src/components/chart/candlestickChart.js       |   0
+ appfrontend/src/components/chart/orderBook.js      |   0
+ appfrontend/src/components/chart/volumeChart.js    |   0
+ .../src/components/portfolio/accountSummary.js     |   0
+ appfrontend/src/components/portfolio/pnl.js        |   0
+ appfrontend/src/components/trading/orderPanel.js   |   0
+ .../src/components/trading/positionPanel.js        |   0
+ appfrontend/src/components/trading/tradeHistory.js |   0
+ appfrontend/src/main.js                            |   0
+ appfrontend/src/services/api.js                    |   0
+ appfrontend/src/services/auth.js                   |   0
+ appfrontend/src/services/websocket.js              |   0
+ dashboard/package.json                             |   0
+ dashboard/public/index.html                        |   0
+ .../src/components/agenticMonitor/agentLog.js      |   0
+ .../components/agenticMonitor/agentStatusCard.js   |   0
+ .../src/components/agenticMonitor/agentTimeline.js |   0
+ .../src/components/hardwareMonitor/cpuGauge.js     |   0
+ .../src/components/hardwareMonitor/diskGauge.js    |   0
+ .../src/components/hardwareMonitor/gpuGauge.js     |   0
+ .../src/components/hardwareMonitor/memoryGauge.js  |   0
+ .../components/networkMonitor/connectionStatus.js  |   0
+ .../components/networkMonitor/heartbeatPanel.js    |   0
+ .../src/components/networkMonitor/latencyChart.js  |   0
+ .../src/components/networkMonitor/trafficChart.js  |   0
+ .../src/components/securityPanel/attackFeed.js     |   0
+ .../src/components/securityPanel/kisaReport.js     |   0
+ .../src/components/securityPanel/owaspHeatmap.js   |   0
+ .../src/components/systemHealth/apiHealthCard.js   |   0
+ dashboard/src/components/systemHealth/dbStatus.js  |   0
+ .../src/components/systemHealth/serverMetrics.js   |   0
+ dashboard/src/main.js                              |   0
+ docs/agenticAiDesign.md                            |   0
+ docs/architecture.md                               |   0
+ docs/directory.md                                  | 476 +++++++++++++++++++++
+ docs/domain.md                                     |  52 +++
+ docs/issue.md                                      |  26 ++
+ docs/jobProcess.md                                 | 420 ++++++++++++++++++
+ docs/kisaChecklistMapping.md                       |   0
+ docs/naming.md                                     |  36 ++
+ docs/owaspMapping.md                               |   0
+ infra/Dockerfile                                   |   0
+ infra/cloud/githubActions/red_runner.yml           |   0
+ infra/docker-compose.yml                           |   0
+ requirements.txt                                   |   2 +
+ 117 files changed, 1039 insertions(+)
+67cb028 Update README.md
+ README.md | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+98120bb docs: update README formatting
+ README.md | 876 +++++++++++++++-----------------------------------------------
+ 1 file changed, 213 insertions(+), 663 deletions(-)
+a674015 1. initialize devsecops trading lab with agentic ai
+ .gitignore                                         |  27 +
+ README.md                                          | 888 +++++++++++++++++++++
+ app/__init__.py                                    |   0
+ app/api/__init__.py                                |   0
+ app/api/accounts.py                                |  25 +
+ app/api/health.py                                  |   9 +
+ app/api/instruments.py                             |  70 ++
+ app/api/orders.py                                  |  27 +
+ app/main.py                                        |  13 +
+ app/schemas/accounts.py                            |  24 +
+ app/schemas/instruments.py                         |  15 +
+ app/schemas/orders.py                              |  47 ++
+ app/services/accounts_service.py                   |  35 +
+ app/services/orders_service.py                     |  69 ++
+ data/instruments.json                              | 112 +++
+ requirements.txt                                   |  19 +
+ tests/READMe.md                                    | 230 ++++++
+ tests/e2e/e2e_TEST_HISTORY_20260616_175018.md      |  33 +
+ tests/e2e/test_e2e.py                              | 105 +++
+ tests/executaion.txt                               |  13 +
+ .../integration_TEST_HISTORY_20260616_175018.md    |  29 +
+ tests/integration/test_integration.py              | 106 +++
+ tests/rule.txt                                     |   8 +
+ .../security_TEST_HISTORY_20260616_175018.md       |  26 +
+ tests/security/test_security.py                    | 164 ++++
+ tests/smoke/smoke_TEST_HISTORY_20260616_175018.md  |  33 +
+ tests/smoke/test_api_smoke.py                      | 143 ++++
+ tests/utils/base.py                                | 138 ++++
+ tests/validation/test_validation.py                | 137 ++++
+ .../validation_TEST_HISTORY_20260616_175018.md     |  28 +
+ 30 files changed, 2573 insertions(+)

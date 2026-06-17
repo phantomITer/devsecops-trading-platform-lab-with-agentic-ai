@@ -14,10 +14,11 @@
 | Phase | 내용 | 상태 |
 |-------|------|------|
 | **Phase 1** | 백엔드 API / DB / 테스트 체계 | ✅ **완료** (71/71 테스트 통과) |
-| **Phase 2** | Agentic AI Core 라이브러✅ 완료 |
-| **Phase 3** | 5개 에이전트 구현 (Red/Blue/기관/개인A/개인B) | ⏳ 대기 |
-| **Phase 4** | Frontend (투자자용) + Dashboard (운영자용) | ⏳ 대기 |
-| **Phase 5** | Infra / Cloud / CI/CD 배포 | ⏳ 대기 |
+| **Phase 2** | Frontend (투자자용) + Dashboard (운영자용) | ⏳ 대기 |
+| **Phase 3** | Infra / Cloud / CI/CD 배포 | ⏳ 대기 |
+| **Phase 4** | Agentic AI Core 라이브러리 ⏳ 대기 |
+| **Phase 5** | 5개 에이전트 구현 (Red/Blue/기관/개인A/개인B) | ⏳ 대기 |
+
 
 ## 🛠️ Technology Stack
 
@@ -316,7 +317,23 @@ python  tests/e2e/test_e2e.py -v
 - 테스트 체계 구축 및 79/79 통과
 - 보안 미들웨어 (헤더, 로깅)
 
-### 🔜 진행 예정 (Phase 2)
+### 🔜 진행예정 (Phase 2)
+
+- 투자자용 프론트엔드 (`appfrontend/`) - OO증권 UI 스타일
+- 운영자 대시보드 (`dashboard/`) - Azure 포털 스타일
+  - 에이전트 실시간 모니터링
+  - 보안 이벤트 시각화
+
+
+### 📋 대기 중 (Phase 3)
+
+- Docker / Docker Compose 컨테이너화
+- GitHub Actions CI/CD 파이프라인
+- SAST / DAST / 이미지 스캔 자동화
+- Azure Arc 하이브리드 클라우드 연동
+
+
+### 📋 대기 중 (Phase 4)
 
 - `agenticAi/core/` 공통 라이브러리 구현
   - `base.py` - 베이스 에이전트 클래스
@@ -325,7 +342,7 @@ python  tests/e2e/test_e2e.py -v
   - `tools/` - 공통 툴 레지스트리
   - `memory_store.py` - 에이전트 메모리/상태 관리
 
-### 📋 대기 중 (Phase 3)
+### 📋 대기 중 (Phase 5)
 
 - 🔴 Red Agent: OWASP Top 10 공격 시뮬레이션 (10개 공격 모듈)
 - 🔵 Blue Agent: KISA RAG 기반 탐지 및 방어
@@ -333,19 +350,6 @@ python  tests/e2e/test_e2e.py -v
 - 👤 Retail Agent A: 단타 투자자 자동매매 (모멘텀/기술적 분석)
 - 👤 Retail Agent B: 장기 투자자 자동매매 (가치투자/배당)
 
-### 📋 대기 중 (Phase 4)
-
-- 투자자용 프론트엔드 (`appfrontend/`) - OO증권 UI 스타일
-- 운영자 대시보드 (`dashboard/`) - Azure 포털 스타일
-  - 에이전트 실시간 모니터링
-  - 보안 이벤트 시각화
-
-### 📋 대기 중 (Phase 5)
-
-- Docker / Docker Compose 컨테이너화
-- GitHub Actions CI/CD 파이프라인
-- SAST / DAST / 이미지 스캔 자동화
-- Azure Arc 하이브리드 클라우드 연동
 
 ---
 
