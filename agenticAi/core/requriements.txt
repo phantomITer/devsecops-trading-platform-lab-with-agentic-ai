@@ -1,0 +1,13 @@
+# agenticAi/core - Phase 2 Requirements
+# Install with: pip install -r agenticAi/core/requriements.txt
+
+# HTTP client for Ollama API
+requests>=2.31.0
+
+# SQLAlchemy (used via app.models - already in app requirements)
+# Listed here for documentation clarity
+sqlalchemy>=2.0.0
+
+# Standard library only (no extra deps) for:
+# - abc, threading, pathlib, json, logging -> stdlib
+# - typing -> stdlib
