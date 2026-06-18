@@ -125,6 +125,63 @@ pytest tests/test_v1.py -v
 ---
 
 ## 🔄 Phase 의존성 그래프
+## Architecture
+
+```mermaid
+flowchart LR
+    U[User Trader]
+    FE[Web Frontend]
+    WAF[WAF]
+    APIGW[API Gateway]
+    API[FastAPI Backend]
+    DB[(Trading DB)]
+    MD[Market Data API]
+    KRX[(KRX Data via pykrx)]
+    RED[Red Agent]
+    BLUE[Blue Agent]
+    INST[Institutional Agent]
+    RETA[Retail Agent A]
+    RETB[Retail Agent B]
+    SIEM[SIEM and Log Store]
+    KMS[Key Management]
+    CI[GitHub Actions CI]
+    SAST[Bandit SAST]
+    DEP[pip audit]
+    DK[Docker Compose]
+    CL[Cloud Deploy]
+
+    U --> FE
+    FE --> WAF
+    WAF --> APIGW
+    APIGW --> API
+
+    API --> DB
+    API --> MD
+    MD --> KRX
+
+    RED --> API
+    RED --> MD
+    BLUE --> API
+    BLUE --> MD
+    INST --> API
+    INST --> MD
+    RETA --> API
+    RETA --> MD
+    RETB --> API
+    RETB --> MD
+
+    API --> SIEM
+    RED --> SIEM
+    BLUE --> SIEM
+
+    KMS --> API
+    KMS --> DB
+
+    CI --> SAST
+    CI --> DEP
+    CI --> DK
+    DK --> CL
+```
 
 ```mermaid
 graph TB
@@ -202,6 +259,139 @@ graph TB
     class B1,B2,B3,B4,C1,C2,C3,D1,D3,D5,E4,E5,E6 waiting
     class E1,E2,E3 partial
 ```
+
+## flow sequence
+1. 인간 사용자 트레이딩 플로우 (로그인 → 계좌 → 주문 → 체결)
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant FE as Frontend
+    participant API as Trading API
+    participant DB as Trading DB
+
+    U->>FE: 1. 로그인 정보 입력
+    FE->>API: 2. 로그인 요청 (username, password)
+    API->>DB: 3. 사용자 검증
+    DB-->>API: 4. 사용자 정보 반환
+    API-->>FE: 5. 토큰 발급 또는 인증 실패
+    FE-->>U: 6. 로그인 결과 표시
+
+    U->>FE: 7. 계좌 생성 요청
+    FE->>API: 8. 계좌 생성 API 호출
+    API->>DB: 9. 계좌 데이터 저장
+    DB-->>API: 10. 저장 결과
+    API-->>FE: 11. 계좌 생성 결과
+    FE-->>U: 12. 계좌 정보 표시
+
+    U->>FE: 13. 주문 입력 (매수/매도)
+    FE->>API: 14. 주문 생성 API 호출
+    API->>DB: 15. 주문 및 계좌 상태 업데이트
+    DB-->>API: 16. 업데이트 결과
+    API-->>FE: 17. 주문 결과 (접수/체결/거절)
+    FE-->>U: 18. 주문 결과 표시
+```
+
+2. Agentic AI 기반 자동매매 플로우 (시세 조회 → 전략 → 주문 → 포지션 확인)
+``` mermaid 
+sequenceDiagram
+    participant AG as Agent
+    participant MD as Market Data API
+    participant API as Trading API
+    participant DB as Trading DB
+
+    AG->>MD: 1. 시세 조회 요청 (symbol, 기간)
+    MD-->>AG: 2. 시세 데이터 응답
+
+    AG->>AG: 3. 전략 결정 (LLM, 규칙, 리스크 체크)
+
+    AG->>API: 4. 주문 요청 (계정, 종목, 수량, 가격)
+    API->>DB: 5. 주문 및 계좌 상태 기록
+    DB-->>API: 6. 기록 결과 및 계좌 잔고/포지션
+
+    API-->>AG: 7. 주문 결과 응답
+
+    AG->>API: 8. 포지션 및 잔고 조회
+    API->>DB: 9. 최신 계좌/포지션 조회
+    DB-->>API: 10. 계좌/포지션 데이터 반환
+    API-->>AG: 11. 최종 상태 응답
+
+```
+3.  Red / Blue Security Agentic AI 플로우 (공격 시뮬레이션 ↔ 탐지/대응)
+``` mermaid 
+sequenceDiagram
+    participant RED as Red Agent
+    participant BLUE as Blue Agent
+    participant API as Trading API
+    participant SEC as Security Events API
+    participant SIEM as SIEM Log Store
+
+    RED->>API: 1. 공격 시나리오 요청 또는 악의적 입력 전송
+    API-->>RED: 2. 응답 (차단/오류/정상 처리)
+
+    RED->>SEC: 3. 공격 이벤트 기록 요청
+    SEC->>SIEM: 4. 이벤트 로그 적재
+    SIEM-->>SEC: 5. 적재 결과
+    SEC-->>RED: 6. 공격 이벤트 기록 결과
+
+    BLUE->>SEC: 7. 보안 이벤트 조회 요청
+    SEC->>SIEM: 8. 이벤트 검색
+    SIEM-->>SEC: 9. 검색 결과
+    SEC-->>BLUE: 10. 보안 이벤트 목록
+
+    BLUE->>BLUE: 11. 탐지·대응 전략 결정 (KISA, ISMS 기준)
+
+    BLUE->>SEC: 12. 대응 이벤트 또는 알림 기록
+    SEC->>SIEM: 13. 대응 이벤트 적재
+    SIEM-->>SEC: 14. 적재 결과
+    SEC-->>BLUE: 15. 대응 기록 결과
+
+```
+4. 보안 테스트 플로우 (OWASP Top 10, Validation, Integration, E2E)
+``` mermaid 
+sequenceDiagram
+    participant DEV as Developer
+    participant CI as GitHub Actions CI
+    participant TST as Pytest Suite
+    participant SAST as Bandit
+    participant DEP as pip audit
+    participant REPO as Git Repo
+
+    DEV->>REPO: 1. 코드 변경 및 커밋
+    DEV->>REPO: 2. main 브랜치로 push
+
+    REPO-->>CI: 3. CI 파이프라인 트리거
+
+    CI->>TST: 4. pytest 전체 실행 (smoke, validation, integration, security, e2e)
+    TST-->>CI: 5. 테스트 결과 (110개 케이스)
+
+    CI->>SAST: 6. Bandit SAST 실행
+    SAST-->>CI: 7. SAST 결과 (취약점 리포트)
+
+    CI->>DEP: 8. pip audit 실행
+    DEP-->>CI: 9. 의존성 취약점 리포트
+
+    CI-->>DEV: 10. CI 상태 및 리포트 (성공/실패)
+```
+
+5. 배포 플로우 (CI → Docker → Cloud)
+```mermaid
+sequenceDiagram
+    participant CI as GitHub Actions CI
+    participant DK as Docker Build
+    participant REG as Container Registry
+    participant CL as Cloud Platform
+
+    CI->>DK: 1. Docker 이미지 빌드 (앱 + MySQL)
+    DK-->>CI: 2. 빌드 결과
+
+    CI->>REG: 3. 이미지 푸시
+    REG-->>CI: 4. 푸시 완료
+
+    CI->>CL: 5. 배포 트리거 (컨테이너 업데이트)
+    CL-->>CI: 6. 배포 상태 응답
+
+```
+
 
 ---
 
