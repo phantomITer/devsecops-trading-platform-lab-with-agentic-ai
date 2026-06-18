@@ -182,9 +182,8 @@ flowchart LR
     DK --> CL
 ```
 
-```mermaid
-
 ### 4. 🔄 Phase 의존성 그래프
+```mermaid
 graph TB
     subgraph P1["Phase 1: Backend Development ✅"]
         A1[1.1 FastAPI API] --> A2[1.2 비즈니스 로직]
