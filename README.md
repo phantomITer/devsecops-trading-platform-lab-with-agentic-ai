@@ -124,8 +124,7 @@ pytest tests/test_v1.py -v
 
 ---
 
-## 🔄 Phase 의존성 그래프
-## Architecture
+### 3. System Architecture
 
 ```mermaid
 flowchart LR
@@ -184,6 +183,8 @@ flowchart LR
 ```
 
 ```mermaid
+
+### 4. 🔄 Phase 의존성 그래프
 graph TB
     subgraph P1["Phase 1: Backend Development ✅"]
         A1[1.1 FastAPI API] --> A2[1.2 비즈니스 로직]
@@ -260,8 +261,8 @@ graph TB
     class E1,E2,E3 partial
 ```
 
-## flow sequence
-1. 인간 사용자 트레이딩 플로우 (로그인 → 계좌 → 주문 → 체결)
+### 5. flow sequence
+5.1 인간 사용자 트레이딩 플로우 (로그인 → 계좌 → 주문 → 체결)
 ```mermaid
 sequenceDiagram
     participant U as User
@@ -291,8 +292,8 @@ sequenceDiagram
     FE-->>U: 18. 주문 결과 표시
 ```
 
-2. Agentic AI 기반 자동매매 플로우 (시세 조회 → 전략 → 주문 → 포지션 확인)
-``` mermaid 
+5.2 Agentic AI 기반 자동매매 플로우 (시세 조회 → 전략 → 주문 → 포지션 확인)
+```mermaid 
 sequenceDiagram
     participant AG as Agent
     participant MD as Market Data API
@@ -316,8 +317,8 @@ sequenceDiagram
     API-->>AG: 11. 최종 상태 응답
 
 ```
-3.  Red / Blue Security Agentic AI 플로우 (공격 시뮬레이션 ↔ 탐지/대응)
-``` mermaid 
+5.3  Red / Blue Security Agentic AI 플로우 (공격 시뮬레이션 ↔ 탐지/대응)
+```mermaid 
 sequenceDiagram
     participant RED as Red Agent
     participant BLUE as Blue Agent
@@ -346,7 +347,7 @@ sequenceDiagram
     SEC-->>BLUE: 15. 대응 기록 결과
 
 ```
-4. 보안 테스트 플로우 (OWASP Top 10, Validation, Integration, E2E)
+5.4 보안 테스트 플로우 (OWASP Top 10, Validation, Integration, E2E)
 ``` mermaid 
 sequenceDiagram
     participant DEV as Developer
@@ -373,7 +374,7 @@ sequenceDiagram
     CI-->>DEV: 10. CI 상태 및 리포트 (성공/실패)
 ```
 
-5. 배포 플로우 (CI → Docker → Cloud)
+5.5 배포 플로우 (CI → Docker → Cloud)
 ```mermaid
 sequenceDiagram
     participant CI as GitHub Actions CI
@@ -391,7 +392,6 @@ sequenceDiagram
     CL-->>CI: 6. 배포 상태 응답
 
 ```
-
 
 ---
 
