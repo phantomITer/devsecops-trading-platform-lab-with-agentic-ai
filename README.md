@@ -182,6 +182,8 @@ flowchart LR
     DK --> CL
 ```
 
+
+
 ### 4. 🔄 Phase 의존성 그래프
 ```mermaid
 graph TB
@@ -260,6 +262,8 @@ graph TB
     class E1,E2,E3 partial
 ```
 
+
+
 ### 5. flow sequence
 5.1 인간 사용자 트레이딩 플로우 (로그인 → 계좌 → 주문 → 체결)
 ```mermaid
@@ -314,8 +318,8 @@ sequenceDiagram
     API->>DB: 9. 최신 계좌/포지션 조회
     DB-->>API: 10. 계좌/포지션 데이터 반환
     API-->>AG: 11. 최종 상태 응답
-
 ```
+
 5.3  Red / Blue Security Agentic AI 플로우 (공격 시뮬레이션 ↔ 탐지/대응)
 ```mermaid 
 sequenceDiagram
@@ -344,8 +348,8 @@ sequenceDiagram
     SEC->>SIEM: 13. 대응 이벤트 적재
     SIEM-->>SEC: 14. 적재 결과
     SEC-->>BLUE: 15. 대응 기록 결과
-
 ```
+
 5.4 보안 테스트 플로우 (OWASP Top 10, Validation, Integration, E2E)
 ``` mermaid 
 sequenceDiagram
