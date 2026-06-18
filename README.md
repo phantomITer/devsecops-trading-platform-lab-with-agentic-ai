@@ -58,17 +58,31 @@ uvicorn app.main:app --reload
 #### 옵션 B: MySQL (프로덕션, 선택)
 ```bash
 # Docker MySQL 시작
-docker-compose -f infra/docker-compose.yml up -d
+docker exec -it trading-platform-mysql mysql -u trading_user -p
+# 비밀번호로 trading_pass 입력
+SHOW DATABASES;
 
 # .env 파일 생성
 cat > .env << EOF
 DB_TYPE=mysql
-DB_HOST=localhost
+DB_HOST=10.10.10.10      # 또는 rocky01 NAT IP
 DB_PORT=3306
 DB_NAME=trading_platform
 DB_USER=trading_user
 DB_PASS=trading_pass
 EOF
+
+```bash
+docker run -d \
+  --name trading-platform-mysql \
+  -e MYSQL_ROOT_PASSWORD=RootPass123! \
+  -e MYSQL_DATABASE=trading_platform \
+  -e MYSQL_USER=trading_user \
+  -e MYSQL_PASSWORD=trading_pass \
+  -p 3306:3306 \
+  --restart unless-stopped \
+  mysql:8
+
 
 # 테이블 생성
 python -c "from app.database import init_db; init_db()"
@@ -726,6 +740,87 @@ gantt
 | `market_data` | id, symbol, price, volume, timestamp | KRX 시세 |
 | `agent_logs` | id, agent_id, agent_type, action, result, created_at | Agentic AI 로그 |
 | `security_events` | id, event_type, severity, source, description, created_at | 보안 이벤트 |
+
+## 🧱 Database Schema (MySQL 기준)
+
+### users
+
+- id (int, PK, auto increment)
+- username (varchar(50), unique, not null)
+- email (varchar(100), unique, not null)
+- hashed_password (varchar(255), not null)
+- is_active (bool)
+- created_at (datetime)
+
+### accounts
+
+- id (int, PK, auto increment)
+- user_id (int, FK → users.id, nullable)
+- name (varchar(100), not null)
+- currency (varchar(10), default "KRW")
+- initial_balance (float, default 0.0)
+- current_balance (float, default 0.0)
+- created_at (datetime)
+
+### orders
+
+- id (int, PK, auto increment)
+- account_id (int, FK → accounts.id, not null)
+- symbol (varchar(20), not null)
+- side (varchar(4), "BUY"/"SELL")
+- order_type (varchar(10), "MARKET"/"LIMIT")
+- status (varchar(20), "NEW"/"FILLED"/...)
+- quantity (float, not null)
+- price (float, nullable)
+- created_at (datetime)
+
+### positions
+
+- id (int, PK, auto increment)
+- account_id (int, FK → accounts.id, not null)
+- symbol (varchar(20), not null)
+- quantity (float, default 0.0)
+- avg_price (float, default 0.0)
+- updated_at (datetime)
+
+### agent_logs / security_events
+
+- agent_logs: agent_id, agent_type, action, result(text), created_at
+- security_events: event_type, severity, source, description(text), created_at
+
+## 🔁 Trading Rules (Order → Position → Balance)
+
+- **BUY**
+  - `current_balance -= quantity * price` (잔고 부족 시 400 에러)
+  - 포지션이 없으면 생성: `quantity`, `avg_price = price`
+  - 포지션이 있으면:
+    - `new_qty = old_qty + qty`
+    - `new_avg = (old_qty * old_avg + qty * price) / new_qty`
+
+- **SELL**
+  - `current_balance += quantity * price`
+  - 포지션 없으면 400: `"Cannot sell: no existing position"`
+  - 보유 수량보다 많이 팔면 400: `"Cannot sell more than current position quantity"`
+  - 일부 매도: `quantity` 감소, `avg_price` 유지
+  - 전량 매도: `quantity = 0`, `avg_price = 0`
+
+  ## 🧹 DB 초기화 (데이터만 삭제)
+
+```sql
+USE trading_platform;
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE orders;
+TRUNCATE TABLE positions;
+TRUNCATE TABLE accounts;
+TRUNCATE TABLE agent_logs;
+TRUNCATE TABLE security_events;
+TRUNCATE TABLE users;
+
+SET FOREIGN_KEY_CHECKS = 1;
+```
+
 
 ---
 

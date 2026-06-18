@@ -10,7 +10,16 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
 
+    # 기존 기본 DB URL (sqlite용 기본값으로 유지)
     DB_URL: str = "sqlite:///./trading.db"
+
+    # ✅ 우리가 .env 에 추가한 MySQL/SQLite 전환용 설정들
+    DB_TYPE: str = "sqlite"            # "sqlite" 또는 "mysql"
+    DB_HOST: str = "localhost"
+    DB_PORT: int = 3306
+    DB_NAME: str = "trading_platform"
+    DB_USER: str = "trading_user"
+    DB_PASS: str = "trading_pass"
 
     SECRET_KEY: str = "dev-secret-key-change-in-production"
     ALGORITHM: str = "HS256"

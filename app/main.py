@@ -1,15 +1,30 @@
-
 from contextlib import asynccontextmanager
+
+from dotenv import load_dotenv  # ⬅ 추가
+load_dotenv()  # ⬅ 추가 (.env 를 환경변수로 로드)
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import init_db
-from app.api.v1 import auth, users, accounts, orders, positions, agent_logs, security_events, health, market_data
+from app.api.v1 import (
+    auth,
+    users,
+    accounts,
+    orders,
+    positions,
+    agent_logs,
+    security_events,
+    health,
+    market_data,
+)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
     print("[APP] DevSecOps Trading Platform v1.0.0 started")
     yield
+
 
 app = FastAPI(
     title="DevSecOps Trading Platform",
