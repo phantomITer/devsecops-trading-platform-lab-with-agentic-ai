@@ -51,7 +51,7 @@ class TestSecurity:
             "currency": "KRW",
             "initial_balance": 1000
         })
-        assert r.status_code in (201, 422)
+        assert r.status_code in (400, 422)
 
     def test_extreme_quantity_price_handled(self, client, test_account):
         """극단적 수량/가격 주문 처리"""
@@ -63,7 +63,7 @@ class TestSecurity:
             "quantity": 999999999,
             "price": 999999999
         })
-        assert r.status_code in (201, 422)
+        assert r.status_code in (400, 422)
 
     def test_xss_attempt_in_username(self, client):
         """XSS 시도 username 안전하게 처리"""

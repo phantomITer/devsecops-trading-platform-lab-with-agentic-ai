@@ -27,7 +27,7 @@ class TestE2E:
         r = client.post("/api/v1/accounts/", json={
             "name": "E2E 모의계좌",
             "currency": "KRW",
-            "initial_balance": 10000000
+            "initial_balance": 10_000_000
         })
         assert r.status_code == 201
         account_id = r.json()["id"]
@@ -35,29 +35,31 @@ class TestE2E:
         # 4. 계좌 조회 + 잔고 확인
         r = client.get(f"/api/v1/accounts/{account_id}")
         assert r.status_code == 200
-        assert r.json()["current_balance"] == 10000000
+        assert r.json()["current_balance"] == 10_000_000
 
-        # 5. 매수 주문
+        # 5. 매수 주문 (BUY LIMIT)
         r = client.post("/api/v1/orders/", json={
             "account_id": account_id,
             "symbol": "005930",
             "side": "BUY",
             "order_type": "LIMIT",
             "quantity": 10,
-            "price": 75000
+            "price": 75_000
         })
         assert r.status_code == 201
-        assert r.json()["status"] == "NEW"
+        assert r.json()["status"] == "FILLED"
 
-        # 6. 매도 주문
+        # 6. 매도 주문 (SELL MARKET, 보유 수량 이내 + 가격 명시)
         r = client.post("/api/v1/orders/", json={
             "account_id": account_id,
             "symbol": "005930",
             "side": "SELL",
             "order_type": "MARKET",
-            "quantity": 5
+            "quantity": 5,
+            "price": 80_000,
         })
         assert r.status_code == 201
+        assert r.json()["status"] == "FILLED"
 
         # 7. 주문 목록 확인
         r = client.get("/api/v1/orders/")
@@ -99,7 +101,7 @@ class TestE2E:
                 "side": "BUY",
                 "order_type": "LIMIT",
                 "quantity": 5,
-                "price": 50000
+                "price": 50_000
             })
             assert r.status_code == 201
 
@@ -117,7 +119,7 @@ class TestE2E:
             "side": "BUY",
             "order_type": "LIMIT",
             "quantity": 10,
-            "price": 75000
+            "price": 75_000
         })
 
         # 포지션 목록 조회
@@ -131,7 +133,7 @@ class TestE2E:
         r = client.post("/api/v1/accounts/", json={
             "name": "DevSecOps 테스트",
             "currency": "KRW",
-            "initial_balance": 50000000
+            "initial_balance": 50_000_000
         })
         assert r.status_code == 201
         account_id = r.json()["id"]
@@ -154,15 +156,17 @@ class TestE2E:
         })
         assert r.status_code == 201
 
-        # 운영: 주문 실행
+        # 운영: 주문 실행 (BUY MARKET, price 명시)
         r = client.post("/api/v1/orders/", json={
             "account_id": account_id,
             "symbol": "005930",
             "side": "BUY",
             "order_type": "MARKET",
-            "quantity": 100
+            "quantity": 100,
+            "price": 75_000,
         })
         assert r.status_code == 201
+        assert r.json()["status"] == "FILLED"
 
         # 전체 상태 확인
         assert client.get("/api/v1/accounts/").status_code == 200

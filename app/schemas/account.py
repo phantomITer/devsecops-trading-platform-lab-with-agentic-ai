@@ -1,9 +1,9 @@
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from datetime import datetime
 
 class AccountCreate(BaseModel):
-    name: str
+    name: str = Field(..., max_length=100)
     currency: str                    # 필수 - 누락 시 422
     initial_balance: float = 0.0    # 0은 합리적 기본값이므로 유지
 

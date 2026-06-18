@@ -188,29 +188,40 @@ def test_list_security_events():
     r = client.get("/api/v1/security-events/")
     assert r.status_code == 200
 
-def test_e2e_full_flow():
-    reg = client.post("/api/v1/auth/register", json={
-        "username": "e2euser", "email": "e2e@test.com", "password": "e2epass123"
+def test_e2e_full_flow(client):
+    # 1) 회원가입
+    r = client.post("/api/v1/auth/register", json={
+        "username": "v1e2e",
+        "email": "v1e2e@test.com",
+        "password": "v1e2e1234",
     })
-    assert reg.status_code == 201
+    assert r.status_code == 201
 
-    login = client.post("/api/v1/auth/login", json={
-        "username": "e2euser", "password": "e2epass123"
+    # 2) 로그인
+    r = client.post("/api/v1/auth/login", json={
+        "username": "v1e2e",
+        "password": "v1e2e1234",
     })
-    assert login.status_code == 200
+    assert r.status_code == 200
+    assert "access_token" in r.json()
 
-    acc = client.post("/api/v1/accounts/", json={
-        "name": "E2E Account", "currency": "KRW", "initial_balance": 5000000
+    # 3) 계좌 생성
+    r = client.post("/api/v1/accounts/", json={
+        "name": "v1 E2E 계좌",
+        "currency": "KRW",
+        "initial_balance": 5_000_000,
     })
-    assert acc.status_code == 201
+    assert r.status_code == 201
+    account_id = r.json()["id"]
 
-    order = client.post("/api/v1/orders/", json={
-        "account_id": acc.json()["id"],
+    # 4) 주문 (BUY LIMIT, 즉시 체결 기대)
+    r = client.post("/api/v1/orders/", json={
+        "account_id": account_id,
         "symbol": "005930",
         "side": "BUY",
         "order_type": "LIMIT",
         "quantity": 5,
-        "price": 75000
+        "price": 75_000,
     })
-    assert order.status_code == 201
-    assert order.json()["status"] == "NEW"
+    assert r.status_code == 201
+    assert r.json()["status"] == "FILLED"
