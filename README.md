@@ -47,13 +47,12 @@ pip install -r requirements.txt
 
 #### 옵션 A: SQLite (개발용, 기본)
 ```bash
-# .env 파일 생성
 echo "DB_TYPE=sqlite" > .env
-
-# 서버 실행
+python -c "from app.database import init_db; init_db()"
 uvicorn app.main:app --reload
 # uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+
 
 #### 옵션 B: MySQL (프로덕션, 선택)
 ```bash
@@ -88,13 +87,82 @@ docker run -d \
 python -c "from app.database import init_db; init_db()"
 ```
 
-### 5. 서버 실행
+### 5. Frontend 준비 (Phase 2)
+
+#### 5-1. React 프로젝트 생성
+
+```bash
+# 프로젝트 루트에서 (이미 appfrontend가 있다면 이 단계는 생략)
+mkdir -p appfrontend
+cd appfrontend
+
+# React 18 + TypeScript SPA (Vite 예시)
+npm create vite@latest . -- --template react-ts
+
+# 기본 의존성 설치
+npm install
+npm install axios react-router-dom
+```
+
+> 현재 UI 스타일링은 기본 CSS/레이아웃 위주로 진행 중이며,  
+> Tailwind CSS 및 추가 UI 라이브러리는 Phase 2 진행 상황에 따라 도입 예정이다.
+
+#### 5-2. Backend 연동 기본 설정
+
+```ts
+// appfrontend/src/api/client.ts
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "http://localhost:8000/api/v1",
+});
+
+export async function getMarketData(symbol: string) {
+  const res = await api.get(`/market-data/${symbol}`);
+  return res.data;
+}
+
+export async function getOrders() {
+  const res = await api.get("/orders/");
+  return res.data;
+}
+
+export async function getPositions() {
+  const res = await api.get("/positions/");
+  return res.data;
+}
+
+export async function createOrder(payload: {
+  account_id: number;
+  symbol: string;
+  side: "BUY" | "SELL";
+  order_type: "LIMIT" | "MARKET";
+  price: number;
+  quantity: number;
+}) {
+  const res = await api.post("/orders/", payload);
+  return res.data;
+}
+```
+
+#### 5-3. Frontend 개발 서버 실행
+
+```bash
+# 프로젝트 루트/appfrontend 디렉터리에서
+npm run dev
+```
+
+- Backend (FastAPI): `http://localhost:8000`
+- Frontend (Vite): `http://localhost:5173`
+
+
+### 6. 서버 실행
 ```bash
 uvicorn app.main:app --reload
 # uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 6. 동작 확인
+### 7. 동작 확인
 
 | 항목 | URL |
 |------|-----|
@@ -102,7 +170,7 @@ uvicorn app.main:app --reload
 | ReDoc | http://localhost:8000/redoc |
 | Health Check | http://localhost:8000/api/v1/health |
 
-### 7. 테스트 실행
+### 8. 테스트 실행
 ```bash
 # 전체 테스트
 pytest tests/ -v
@@ -116,6 +184,8 @@ pytest tests/e2e/ -v
 pytest tests/test_phase2_agents.py -v
 pytest tests/test_v1.py -v
 ```
+
+
 
 ---
 
@@ -474,11 +544,59 @@ gantt
 
 | 항목 | 상태 | 설명 |
 |------|------|------|
-| 2.1 투자자 거래 UI | ⏳ 대기 | 주문 생성/조회/취소 |
+| 2.1 투자자 거래 UI | ⏳ 대기 | 주문 생성/조회/취소 (스코프 정의 완료, 구현 대기) |
 | 2.2 포트폴리오 대시보드 | ⏳ 대기 | 보유 자산, 손익 현황 |
 | 2.3 운영자 모니터링 UI | ⏳ 대기 | 전체 시스템 관리 |
 | 2.4 실시간 시세 *(기본)* | ⏳ 대기 | WebSocket + 차트 |
 
+
+#### 2.1 Frontend Phase 2 현재 범위
+
+현재 프론트엔드 구현은 다음 범위를 우선 목표로 한다.
+
+- 로그인 및 JWT 인증 연동
+- 메인 거래 화면 UI 구축
+- 시세 조회 기능
+- 주문 입력 및 주문 생성 API 연동
+- 주문내역 조회
+- 포지션 조회 및 **계좌별 필터링 렌더링**
+- 로딩/에러 상태 처리
+- WebSocket 기반 실시간 시세 반영(가능 범위 내 우선 적용)
+
+#### 2.2 현재 거래 모델 정책
+
+현재 단계에서는 플랫폼 전체 흐름을 빠르게 검증하기 위해 **단순 체결 모델**을 우선 적용한다.
+
+- 주문 생성 시 즉시 체결된 것으로 간주할 수 있다.
+- 포지션은 주문 결과에 따라 생성 또는 갱신된다.
+- 이 단계에서는 별도의 체결 테이블이나 정교한 호가 매칭 엔진을 필수 범위로 두지 않는다.
+
+이 정책은 프론트엔드/백엔드 연동과 기본 거래 흐름 검증을 위한 MVP 목적에 맞춘 것이다.
+
+#### 2.3 향후 시장 시뮬레이션 확장
+
+이후 단계에서는 시장 미시구조를 반영하는 정교한 거래 시뮬레이션으로 확장한다.
+
+- order book(호가창) 도입
+- executions / fills 테이블 추가
+- price-time priority 기반 매칭 엔진 구현
+- 부분 체결 및 잔량 주문 상태 관리
+- 체결 누적 기반 포지션 계산
+- 기관 agent / 개미 agent / 기타 agent 간 상호작용 거래 시뮬레이션
+
+#### 2.4 포지션 데이터 메모
+
+`positions` 데이터는 계좌별 현재 보유 종목 상태를 의미한다.
+
+예시 필드:
+
+- `account_id`
+- `symbol`
+- `quantity`
+- `avg_price`
+- `updated_at`
+
+- 포지션은 주문 그 자체가 아니라, 실제 거래 결과(또는 현재 단계에서는 단순 체결 정책에 따른 결과)를 반영한 잔고 상태다.
 ---
 
 ### ⏳ Phase 3: Platform Validation (대기)
@@ -573,7 +691,7 @@ gantt
 | 기술 | 용도 |
 |------|------|
 | React 18+ / TypeScript | SPA 프레임워크 |
-| Ant Design / Tailwind CSS | UI 컴포넌트 |
+| Ant Design, Tailwind CSS *(검토 중)* | UI 컴포넌트 / 유틸리티 CSS |
 | Chart.js / TradingView | 실시간 시세 차트 |
 | WebSocket | 실시간 데이터 연동 |
 
